@@ -11,6 +11,6 @@ gcc -Wall -o server *.c -lrt -pthread
 Модули-клиенты (стартуют в тесте автоматически):
 ```
 cd proc_client
-gcc -Wall -o capturer ../proc_serv/shared_memory.h capturer.c
-gcc -Wall -o filter ../proc_serv/shared_memory.h filter.c
+gcc -Wall -o capturer ../proc_serv/shared_memory.h capturer.c -lrt -pthread
+gcc -Wall -o filter ../proc_serv/shared_memory.h filter.c  -lrt -pthread
 ```
