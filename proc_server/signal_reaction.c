@@ -73,6 +73,7 @@ static void* signal_thread(void *data){
 		        process_cleanup_zombies();
 		        break;
 		    default:
+                fprintf(stdout, "Exit signal received\n");
 		        *exit_flag = 1;
 		        break;
 	        }

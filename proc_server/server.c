@@ -201,8 +201,9 @@ void *destination_thread(void *data){
     char *proc[] = { NULL };
 
     module->id = -1;
+#if 0 //no child process, only thread
     module->proc_info = (struct process_info *)(module->shmem + memory_get_processoffset(module->shmem)) + module->id;   
-
+#endif
     while(1){
 	    sem_wait(&module->new_cmd);
         cmd = module->cmd; //TODO: queue
@@ -213,7 +214,8 @@ void *destination_thread(void *data){
 	        break;
 	    }
         packet = (char*)(module->shmem + packetoffset);
-        printf("process_thread: capture packet %p, packet: %s\n", packet, packet);
+        fprintf(stdout, "[destination_thread]: get packet %p, packet: %s\n", packet, packet);
+#if 0 //no child process, only thread
         module->proc_info->cmd = cmd; 
         module->proc_info->cmd_offs = packetoffset;
 	    sem_post(&module->proc_info->sem_job);
@@ -221,21 +223,22 @@ void *destination_thread(void *data){
 
 	    if (module->proc_info->cmd_result != 0){
 	        // previous process report an error, drop frame and continue
-	        printf("process_thread: processor error %d, drop packet %p\n",
+	        printf("destination_thread: destination error %d, drop packet %p\n",
 		        module->proc_info->cmd_result, packet);
             //pushfree buffer
 	        ring_buffer_push(module->data_ring, packetoffset); 
 	        continue;
 	    }
 	    printf("destination_thread: passed packet %p, packet: %s\n", packet, packet);
+#endif
         ring_buffer_push(module->data_ring, packetoffset);
     }
-    printf("destination_thread: stop\n");
-
+    fprintf(stdout, "[destination_thread]: stop\n");
+#if 0 //no child process, only thread
 	module->proc_info->cmd = PROCESS_CMD_STOP;
 	sem_post(&module->proc_info->sem_job);
     sem_wait(&module->proc_info->sem_result);
-    
+#endif
     return NULL;
 }
 
@@ -254,19 +257,19 @@ void *source_thread(void *data){
         cmd = module->cmd; //TODO: queue
         packetoffset = ring_buffer_pop(module->data_ring);
         packet = module->shmem + packetoffset;
-        printf("source_thread: get packet %p, packet %s\n", packet, packet);
+        fprintf(stdout, "[source_thread]: capture packet %p, packet %s\n", packet, packet);
         module->proc_info->cmd = cmd; 
         module->proc_info->cmd_offs = packetoffset;
 	    sem_post(&module->proc_info->sem_job);
         sem_wait(&module->proc_info->sem_result);
-	    printf("source_thread: captured packet %p, packet: %s\n", packet, packet);
+	    fprintf(stdout, "[source_thread]: captured packet %p, packet: %s\n", packet, packet);
 	    sem_wait(&module->next->result);
 	    module->next->cmd = PROCESS_CMD_JOB;
 	    module->next->dataoffset = packetoffset;
 	    sem_post(&module->next->new_cmd);
     }
     
-    printf("source_thread: stop\n");
+    fprintf(stdout, "[source_thread]: stop\n");
 	sem_wait(&module->next->result);
 	module->next->cmd = PROCESS_CMD_STOP;
 	sem_post(&module->next->new_cmd);
@@ -299,7 +302,7 @@ void *processor_thread(void *data){
 	        break;
 	    }
         packet = module->shmem + packetoffset;
-        printf("process_thread: capture packet %p, packet: %s\n", packet, packet);
+        fprintf(stdout, "[process_thread]: get packet %p, packet: %s\n", packet, packet);
         module->proc_info->cmd = cmd; 
         module->proc_info->cmd_offs = packetoffset;
 	    sem_post(&module->proc_info->sem_job);
@@ -307,19 +310,19 @@ void *processor_thread(void *data){
 
 	    if (module->proc_info->cmd_result != 0){
 	        // previous process report an error, drop frame and continue
-	        printf("process_thread: processor error %d, drop packet %p\n",
+	        fprintf(stdout, "[process_thread]: processor status %d, drop packet %p\n",
 		        module->proc_info->cmd_result, packet);
             //pushfree buffer
 	        ring_buffer_push(module->data_ring, packetoffset); 
 	        continue;
 	    }
-	    printf("process_thread: processed packet %p, packet: %s\n", packet, packet);
+	    fprintf(stdout, "[process_thread]: processed packet %p, packet: %s\n", packet, packet);
 	    sem_wait(&module->next->result);
 	    module->next->cmd = PROCESS_CMD_JOB;
 	    module->next->dataoffset = packetoffset;
 	    sem_post(&module->next->new_cmd);
     }
-    printf("process_thread: stop\n");
+    fprintf(stdout, "[process_thread]: stop\n");
 	sem_wait(&module->next->result);
 	module->next->cmd = PROCESS_CMD_STOP;
 	sem_post(&module->next->new_cmd);
@@ -333,8 +336,6 @@ void *processor_thread(void *data){
 
 void streamer_process_test(void *shmem, memory_map_t *map, int *exit_flag) {
     
-    (void)exit_flag;
-
     int i;
     int modules_count = 2 + 1;
     module_t modules[modules_count];
@@ -351,6 +352,7 @@ void streamer_process_test(void *shmem, memory_map_t *map, int *exit_flag) {
         sem_init(&modules[i].new_cmd, 0, 0);
         sem_init(&modules[i].result, 0, 1);
         modules[i].data_ring = data_ring;
+        modules[i].exit_flag = exit_flag;
     }
 
     //TODO: list of threads (see process.c/.h) and read parameters from config (.json)
@@ -388,7 +390,7 @@ int main(int argc, char **argv) {
     const char *shmpath = "/testshm";
     shared_memory_destroy(shmpath);
 #endif
-    int	exit_flag;
+    int	exit_flag = 0;
     //backtrace for exception
     setlocale(LC_ALL, "");
     //parse_command_line(argc, argv);
@@ -410,7 +412,6 @@ int main(int argc, char **argv) {
 		    errno, strerror(errno));
 	    return -1;
     }
-
 #endif
     void *shmem = shared_memory_server_init(shmpath, &map);
     command_server_init();
