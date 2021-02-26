@@ -53,15 +53,17 @@ int main(int argc, char *argv[]){
 	    sem_wait(&proc_info->sem_job);
 	    switch(proc_info->cmd){
 	        case PROCESS_CMD_STOP:
-		        printf("%s: child exit\n", argv[0]);
+		        fprintf(stdout, "[%s]: Child exit\n", argv[0]);
+		        fflush(stdout);
 		        exit_flag = 1;
 		        proc_info->cmd_result = 0;
 		        break;
 	        default:
 		        data = shmem + proc_info->cmd_offs;
-		        printf("%s: type image data:\n", argv[0]);
+	            fprintf(stdout, "[%s]: Input data: ", argv[0]);
 		        scanf("%s", s);
-		        sprintf(data, "%d: data=%s", data_cnt++, s);
+		        fflush(stdout);
+                sprintf(data, "%d%s", data_cnt++, s);
 		        proc_info->cmd_result = 0;
 		        break;
 	    }

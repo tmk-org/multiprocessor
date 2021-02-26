@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <locale.h>
 
+#include <string.h>
+
 #include "../proc_server/process_mngr.h"
 #include "../proc_server/shared_memory.h"
 
@@ -28,11 +30,11 @@ int main(int argc, char *argv[]){
 	    exit(EXIT_FAILURE);
     }
     if (shm_size_str == NULL){
-	    fprintf(stderr, "Error/child: SHMEM_DATA_SIZE is not set\n");
+	    fprintf(stderr, "Error child %s: SHMEM_DATA_SIZE is not set\n", argv[0]);
 	    exit(EXIT_FAILURE);
     }
     if (shm_id_str == NULL){
-	    fprintf(stderr, "Error/child: SHMEM_DATA_ID is not set\n");
+	    fprintf(stderr, "Error child %s: SHMEM_DATA_ID is not set\n",argv[0]);
 	    exit(EXIT_FAILURE);
     }
 
@@ -43,26 +45,28 @@ int main(int argc, char *argv[]){
 
     shmem = shared_memory_client_init(shm_path, shm_size);
     if (shmem == NULL)
-	exit(EXIT_FAILURE);
+	    exit(EXIT_FAILURE);
 
     proc_info = (struct process_info *)(shmem + memory_get_processoffset(shmem)) + shm_id;
 
     while(!exit_flag){
-	sem_wait(&proc_info->sem_job);
-	switch(proc_info->cmd){
-	    case PROCESS_CMD_STOP:
-		printf("%s: child exit\n", argv[0]);
-		exit_flag = 1;
-		proc_info->cmd_result = 0;
-		break;
-	    default:
-		data = shmem + proc_info->cmd_offs;
-		printf("%s: data=%s", argv[0], data);
-		// фильтруем по первой букве
-		proc_info->cmd_result = *data & 0x01;
-		break;
-	}
-	sem_post(&proc_info->sem_result);
+	    sem_wait(&proc_info->sem_job);
+	    switch(proc_info->cmd){
+	        case PROCESS_CMD_STOP:
+		        fprintf(stdout, "[%s]: Child exit\n", argv[0]);
+		        exit_flag = 1;
+		        proc_info->cmd_result = 0;
+		        break;
+	        default:
+		        data = shmem + proc_info->cmd_offs;
+		        fprintf(stdout, "[%s]: Get: %s", argv[0], data);
+                fflush(stdout);
+		        // place for filter result
+                //pass or drop
+		        proc_info->cmd_result = (strchr(data, '*') == NULL);
+		    break;
+	    }
+	    sem_post(&proc_info->sem_result);
     }
     return 0;
 }
