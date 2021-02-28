@@ -11,6 +11,7 @@
 
 #include "../proc_server/process_mngr.h"
 #include "../proc_server/shared_memory.h"
+#include "../proc_server/shared_memory_map.h"
 
 int main(int argc, char *argv[]){
     char		*shm_path = getenv("SHMEM_DATA_NAME");

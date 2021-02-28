@@ -11,6 +11,8 @@
 
 #define PROCESS_DATA_MAX_LEN	2048
 
+#define PROCESS_INFO_SIZE       sizeof(struct process_info)
+
 //shared
 struct process_info{
     sem_t		sem_job;

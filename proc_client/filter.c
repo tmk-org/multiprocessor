@@ -13,6 +13,7 @@
 
 #include "../proc_server/process_mngr.h"
 #include "../proc_server/shared_memory.h"
+#include "../proc_server/shared_memory_map.h"
 
 int main(int argc, char *argv[]){
     char		*shm_path = getenv("SHMEM_DATA_NAME");
@@ -59,9 +60,9 @@ int main(int argc, char *argv[]){
 		        break;
 	        default:
 		        data = shmem + proc_info->cmd_offs;
-		        fprintf(stdout, "[%s]: Get: %s", argv[0], data);
+		        fprintf(stdout, "[%s]: Get: %s\n", argv[0], data);
                 fflush(stdout);
-		        // place for filter result
+		        //place for filter result
                 //pass or drop
 		        proc_info->cmd_result = (strchr(data, '*') == NULL);
 		    break;

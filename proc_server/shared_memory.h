@@ -1,41 +1,17 @@
-#ifndef _DCL_SHARED_MEM_H
-#define _DCL_SHARED_MEM_H
+#ifndef _SHARED_MEM_H
+#define _SHARED_MEM_H
 
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <semaphore.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+void *shared_memory_map_create(int proc_cnt, size_t proc_size, int data_cnt, size_t data_size);
 
-#if 0
-#include "memory_data.h"
+size_t shared_memory_size(void *shmem);
 
-typedef struct shm_pdesc {
-    size_t shm_data_offset; //???
-    int shm_result;         //???
-    int status; //for update
-    //may be IPC for capturer instead of queue for event/notify
-    sem_t sem_event; 
-    sem_t sem_notify;
-} shm_pdesc_t;
+void *shared_memory_server_init(const char *shmpath, void *shmmap);
+void *shared_memory_client_init(const char *shmpath, size_t shmsize);
+void shared_memory_destroy(const char *shmpath, void *shmem);
 
-struct shared_memory {
-    char memory_map[MEMORY_MAP_SIZE];
-    shm_pdesc_t pdesc[MAX_PDESC_NUM];
-    memory_data_t data[MAX_DATA_SIZE];
-};
+void shared_memory_unlink(const char *shmpath);
 
-#endif
+int shared_memory_setenv(const char *shmpath, void *shmem);
 
-#include "memory_map.h"
-
-void* shared_memory_server_init(const char *shmpath, memory_map_t *map);
-void* shared_memory_client_init(const char *shmpath, size_t shmsize);
-void shared_memory_destroy(const char *shmpath);
-//int shared_memory_init (int is_child);
-//void shared_memory_destroy (int is_child);
-
-#endif //_DCL_SHARED_MEM_H
+#endif //_SHARED_MEM_H
 

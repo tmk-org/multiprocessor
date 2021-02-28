@@ -7,7 +7,6 @@
 struct ring_buffer * ring_buffer_create(int max_cnt, int empty){
     size_t		size;
     struct ring_buffer	*ring;
-
     size = sizeof(struct ring_buffer) + max_cnt * sizeof(size_t);
     ring = malloc(size);
     if (ring == NULL){
@@ -50,7 +49,6 @@ size_t ring_buffer_pop(struct ring_buffer *ring){
 
 void ring_buffer_push(struct ring_buffer *ring, size_t shmem_offs){
     int pos;
-
     #warning "no overflow check, should not happen"
     pthread_mutex_lock(&ring->mutex);
     pos = ring->start + ring->used++;
