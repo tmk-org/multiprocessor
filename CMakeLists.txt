@@ -65,8 +65,7 @@ add_subdirectory(tcp)
 add_subdirectory(pmngr)
 add_subdirectory(shmem)
 add_subdirectory(streamer)
-#add_subdirectory(server)
-#add_subdirectory(clients)
+add_subdirectory(model)
 
 ###############################################################################
 # Tests

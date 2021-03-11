@@ -10,11 +10,8 @@
 
 #include "pmngr/process_mngr.h"
 
-#if defined PIPELINE
-    #include "pipeline.h"
-#elif defined STREAMER
-    #include "streamer.h"
-#endif
+#include "streamer/pipeline.h"
+#include "streamer/streamer.h"
 
 void usage(char *pname) {
     fprintf(stderr, "Usage: %s /shmpath\n", pname);

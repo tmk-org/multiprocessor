@@ -36,9 +36,11 @@ struct connection{
 #endif
 
 char *defaultExecuteCommand(const char *buf, int *exit_flag) {
-    printf("[defaultExecuteCommand]: TODO execute_command_function\n");
+    fprintf(stdout, "[defaultExecuteCommand]: TODO execute_command_function\n");
+    fflush(stdout);
     if (strcasecmp(buf, "STOP") == 0 || strcasecmp(buf, "S") == 0) {
-        printf("[defaultExecuteCommand]: STOP command recieved\n");
+        fprintf(stdout, "[defaultExecuteCommand]: STOP command recieved\n");
+        fflush(stdout);
         *exit_flag = 1;
     }
     return strdup("OK\n");
@@ -46,7 +48,8 @@ char *defaultExecuteCommand(const char *buf, int *exit_flag) {
 
 char *getRequest() {
     static char s[80];
-    printf("Message: ");
+    fprintf(stdout, "Message: ");
+    fflush(stdout);
 	memset(s, 0, sizeof(s));
 	scanf("%78[^\n]%*c", s);
 	strcat(s, "\n");
@@ -83,6 +86,7 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
     rc = getaddrinfo(NULL, port, &hints, &result);
     if (rc != 0) {
 	    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+	    fflush(stderr);
 	    exit(EXIT_FAILURE);
     }
 
@@ -102,6 +106,7 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 
     if (rp == NULL) {
 	    fprintf(stderr, "Could not bind\n");
+	    fflush(stderr);
 	    exit(EXIT_FAILURE);
     }
 
@@ -109,6 +114,7 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 
     if (listen(fd, 10) != 0){
 	    fprintf(stderr, "Could not listen, error: %s\n", strerror(errno));
+	    fflush(stderr);
 	    exit(EXIT_FAILURE);
     }
 
@@ -128,6 +134,7 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 	    retval = select(max + 1, &rfds, NULL, NULL, NULL);
 	    if (retval == -1){
 	        fprintf(stderr, "Could not select, error: %s\n", strerror(errno));
+	        fflush(stderr);
 	        exit(EXIT_FAILURE);
 	    }
 
@@ -145,10 +152,12 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 		                        peer_addr_len, host, NI_MAXHOST,
 		                        service, NI_MAXSERV, NI_NUMERICSERV);
 		        if (retval == 0) {
-		            printf("Received connection from %s:%s\n", host, service);
+		            fprintf(stdout, "Received connection from %s:%s\n", host, service);
+		            fflush(stdout);
 		        }
 		        else {
 		            fprintf(stderr, "getnameinfo: %s\n", gai_strerror(retval));
+                    fflush(stderr);
 		        }
 		        if (client_cnt < MAX_CONNECTION) {
 		             cfd[client_cnt++] = fd1; 
@@ -156,6 +165,7 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 		        else{
 		            //close connection
 		            fprintf(stderr, "Max connections reached, drop new connection\n");
+                    fflush(stderr);
 		            close(fd1);
 		        }
 	        }
@@ -171,9 +181,11 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 	        bytes = read(cfd[i], buf, sizeof(buf));
 	        if (bytes <= 0){
 				    if (bytes < 0){
-		       		    printf("read error: %s\n", strerror(errno));
+		       		    fprintf(stdout, "read error: %s\n", strerror(errno));
+		       		    fflush(stdout);
 				    }
-				    printf("close connection %d\n", i);
+				    fprintf(stdout, "close connection %d\n", i);
+                    fflush(stdout);
 				    close(cfd[i]);
 				    memmove(&cfd[i], &cfd[i + 1], (client_cnt - i - 1) * sizeof(int));
 				    client_cnt--;
@@ -183,8 +195,8 @@ int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
 	        
 	        //working with data 
 	        buf[bytes] = '\0';
-	        printf("[tcp_process_server]: {connection %d} %s\n", i, buf);
-	        
+	        fprintf(stdout, "[tcp_process_server]: {connection %d} %s\n", i, buf);
+	        fflush(stdout);
 	        //reply
 	        char *reply = exec_cmd(buf, &exit_flag);
 	        write(cfd[i], reply, strlen(reply));

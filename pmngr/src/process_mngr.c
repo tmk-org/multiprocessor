@@ -92,6 +92,11 @@ int process_start(char *argv[]) {
 	        return -1;
 	    }
 
+        // close all parent fd except stdin(fd=0), stdout(fd=1), stderr(fd=2)
+	    for (int fd = 3; fd < 1024; fd++) {
+	        close(fd);
+	    }
+
     #if 0
         int i = 0;
 	    while (argv[i] != NULL ){
