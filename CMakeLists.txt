@@ -66,6 +66,7 @@ add_subdirectory(pmngr)
 add_subdirectory(shmem)
 add_subdirectory(streamer)
 add_subdirectory(model)
+add_subdirectory(emu)
 
 ###############################################################################
 # Tests
