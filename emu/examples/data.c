@@ -14,12 +14,13 @@ int main(){
     for (i = 0; i < TEST_DATA_CNT; i++) {
         char *chunk = (char*)(data + i * TEST_DATA_SIZE); 
         memcpy((void*)chunk, (void*)&data_size, TEST_HEADER_SIZE);
-        for (j = TEST_HEADER_SIZE; j < TEST_DATA_SIZE - 1; j++) {
+        memcpy((void*)(chunk + TEST_HEADER_SIZE), (void*)&i, TEST_HEADER_SIZE);
+        for (j = TEST_HEADER_SIZE*2; j < TEST_DATA_SIZE - 1; j++) {
             *(chunk + j) = 65 + i;
         }
         *(chunk + TEST_DATA_SIZE)='\0';
         buf = (char*)(data + i * TEST_DATA_SIZE);
-        printf("[%d]: %d %s\n", i, *((int*)buf), (char*)(buf + TEST_HEADER_SIZE)); 
+        printf("[%d]: %d %d %s\n", i, *((int*)buf), *((int*)(buf+sizeof(int))), (char*)(buf + TEST_HEADER_SIZE*2)); 
     }
     return 0;
 }

@@ -17,32 +17,32 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 
-#define TEST_DATA_CNT 13
-#define TEST_HEADER_SIZE sizeof(size_t)
-#define TEST_RAW_WIDTH 2448
-#define TEST_RAW_HEIGHT 2048
-#define TEST_RAW_DEPTH 8
-#define TEST_RAW_SIZE ( TEST_RAW_WIDTH * TEST_RAW_HEIGHT * TEST_RAW_DEPTH / 8 )
-#define TEST_DATA_SIZE ( TEST_HEADER_SIZE + TEST_RAW_SIZE )
+#include "filter/cvparams.h"
+
 
 static char data[TEST_DATA_CNT][TEST_DATA_SIZE];
 static int curr = -1;
 
 void tcp_test_data_create() {
     int i, j;
+    size_t data_size = TEST_DATA_SIZE;
     for (i = 0; i < TEST_DATA_CNT; i++) {
         char *chunk = (char*)((char*)data + i * TEST_DATA_SIZE); 
-        *((size_t*)chunk) = TEST_DATA_SIZE;
+        //*((size_t*)chunk) = TEST_DATA_SIZE;
+        //full buffer size and frame_id
+        //TODO: check that TEST_HEADER_SIZE == sizeof(size_t) + sizeof(int)
+        memcpy((void*)chunk, (void*)&data_size, sizeof(size_t));
+        memcpy((void*)(chunk + sizeof(size_t)), (void*)&i, sizeof(int));
         char name[256];
-        sprintf(name, "../data/test_%c.bmp", 65 + i);
+        sprintf(name, "%s/%d.%s", getenv(TEST_SOURCE_PATH_ENV), i, "jpg");
         cv::Mat orig = cv::imread(name, cv::IMREAD_ANYDEPTH |
                                                   cv::IMREAD_ANYCOLOR);
         int origSize = orig.total() * orig.elemSize();
         if (origSize != TEST_RAW_SIZE) {
-            fprintf(stdout, "[cvserver]: problems with datasize\n");
+            fprintf(stdout, "[cvserver]: problems with datasize, orig = %zd, TEST_RAW_SIZE = %zd\n", origSize, TEST_RAW_SIZE);
         }
         memcpy(chunk + TEST_HEADER_SIZE, (char*)orig.data, TEST_RAW_SIZE);
-        fprintf(stdout, "[cvserver]: chunk_size = %zd\n", *((size_t*)chunk));
+        fprintf(stdout, "[cvserver]: chunk_size = %zd data_id = %d\n", *((size_t*)chunk), *((int*)(chunk + sizeof(size_t))));
     }
 }
 

@@ -15,44 +15,125 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 
-#define TEST_DATA_CNT  512
-#define TEST_HEADER_SIZE sizeof(size_t)
-#define TEST_RAW_WIDTH 2448
-#define TEST_RAW_HEIGHT 2048
-#define TEST_RAW_DEPTH 8
-#define TEST_RAW_SIZE ( TEST_RAW_WIDTH * TEST_RAW_HEIGHT * TEST_RAW_DEPTH / 8 )
-#define TEST_DATA_SIZE ( TEST_HEADER_SIZE + TEST_RAW_SIZE )
+#include <semaphore.h>
 
+#include "filter/cvparams.h"
+#include "filter/cvfilter.h"
+
+struct obj_collector {
+    int fd;
+    int exit_flag;
+    sem_t obj_ready;
+    int obj_id;
+};
+
+void *collect_data_thread(void *arg){
+
+    struct obj_collector *collector = (struct obj_collector*)arg;
+    int fd = collector->fd;
+    int *exit_flag = &collector->exit_flag;
+
+    cv::Mat img;
+    img = cv::Mat::zeros(TEST_RAW_HEIGHT, TEST_RAW_WIDTH, CV_8UC3);
+    int imgSize = img.total() * img.elemSize();
+    
+    char header[TEST_HEADER_SIZE];
+    size_t  data_size = 0;
+    int frame_id = 0;
+    struct iovec iov[2];
+    
+    iov[0].iov_base = (char*)header; //(size_t*)&data_size;
+    iov[0].iov_len = TEST_HEADER_SIZE; 
+    iov[1].iov_base = (char*)img.data;
+    iov[1].iov_len = TEST_RAW_SIZE;
+
+    //int iovcnt = sizeof(iov) / sizeof(struct iovec);
+
+    ssize_t bytes = 0, recieved_len = 0, remaining_len = iov[0].iov_len;
+    char name[256];
+    int id = 0;
 
 #if 0
-void* collect_data_thread(void *arg) {
-    pthread_detach(pthread_self());
-    int *fd = (int*)arg;
-    int ln = -1;
-    char *buf = NULL;
-    int buf_size = 0; 
-    while (1) {
-        buf = (char*)tcp_get_next_image();
-        buf_size = (int)(
-        printf("[%d]: size = %d, buf = %s", curr, buf_size, buf);
-        ln = read(*fd, buf, sizeof(buf));
-        if ((ln < 0) || (ln != buf_size)) {
+    if (!img.isContinuous()) {
+        img = img.clone();
+    }
+#endif
+
+    int header_ok = 0;
+    while (!(*exit_flag)) {
+        if (remaining_len == 0) {
+            //fprintf(stdout, "wtf???\n");
+            remaining_len = iov[0].iov_len;
+            continue;
+        }
+#if 0
+        if (!header_ok && recieved_len == 0) {
+            fprintf(stdout, "1\n");
+            bytes = readv(fd, iov, iovcnt);
+        }
+        else 
+#endif
+        if (!header_ok) {
+            //fprintf(stdout, "2\n");
+            bytes = read(fd, (char*)iov[0].iov_base + recieved_len, remaining_len);
+        }
+        else {
+            //fprintf(stdout, "3: recv = %zd, rem = %zd\n", recieved_len, remaining_len);
+            bytes = read(fd, (char*)iov[1].iov_base + recieved_len, remaining_len);
+        }
+        if (bytes < 0) {
+            //fprintf(stdout, "[tcp_capture_data_process]: error while frame_size read\n");
+            *exit_flag = 1;
             break;
+        } 
+        else if (bytes == 0) {
+            continue;
+        }
+        else { 
+            //printf("header=%d bytes=%zd recieved=%zd remining=%zd\n", header_ok, bytes, recieved_len, remaining_len);
+            recieved_len += bytes;
+            if (!header_ok && recieved_len < iov[0].iov_len) {
+                remaining_len -= bytes;
+            }
+            if (!header_ok && recieved_len == iov[0].iov_len) {
+                data_size = *((size_t*)iov[0].iov_base);
+                collector->obj_id = *((int*)((char*)iov[0].iov_base + sizeof(size_t)));
+                //fprintf(stdout, "[tcp_capture_data_process]: found_image_size = %zd found_frame_id = %d\n", data_size, frame_id);
+                if (data_size != TEST_DATA_SIZE) {
+                    fprintf(stdout, "[tcp_capture_data_process]: strange data size = %zd instead of %zd\n", data_size, TEST_DATA_SIZE);
+                }
+#if 0
+                recieved_len -= iov[0].iov_len;
+                remaining_len = iov[1].iov_len - recieved_len;
+#else
+                recieved_len = 0;
+                remaining_len = data_size;
+#endif
+                header_ok = 1;;
+            }
+            if (header_ok && recieved_len < iov[1].iov_len) {
+                remaining_len -= bytes;
+            }
+            if (header_ok && recieved_len == iov[1].iov_len) {
+                if (imgSize != recieved_len) {
+                        fprintf(stdout, "[tcp_capture_data_process]: result size = %zd instead of %zd\n", recieved_len, imgSize);
+                }
+//------------------------------------------------------------------------------------
+                float radius = findRadius(img);
+                //sem_post(&collector->obj_ready);
+//-------------------------------------------------------------------------------------
+                sprintf(name, "../data/test_%.4d.bmp", id++);
+                //cv::imwrite(name, img);
+                remaining_len = iov[0].iov_len;
+                recieved_len = 0;
+                header_ok = 0;
+                fprintf(stdout, "Frame %d is ready, radius = %f \n", id - 1, radius);
+            }
         }
     }
-    close(*fd);
-    return NULL;
-}
-#endif
 
-void nextFrameReady(struct iovec io) {
-#if 0
-    if (imgSize != io.iov_len - TEST_HEADER_SIZE) {
-        fprintf(stdout, "[nextFrameReady]: problems with result size\n");
-    }
-    sprintf(name, "../data/test_%.4d.bmp", id++);
-    cv::imwrite(name, img);
-#endif
+    fprintf(stdout, "[collect_data_thread]: stop\n");
+    return NULL;
 }
 
 int tcp_capture_data_process(char* addr, char *port) {
@@ -86,98 +167,18 @@ int tcp_capture_data_process(char* addr, char *port) {
     }
 
     freeaddrinfo(result);
-     
-    cv::Mat img;
-    img = cv::Mat::zeros(TEST_RAW_HEIGHT, TEST_RAW_WIDTH, CV_8UC1);
-    int imgSize = img.total() * img.elemSize();
     
-    size_t  data_size = 0;
-    struct iovec iov[2];
+    struct obj_collector collector;
+    collector.obj_id = 0;
+    collector.fd = fd;
+    collector.exit_flag = 0;
     
-    iov[0].iov_base = (size_t*)&data_size;
-    iov[0].iov_len = TEST_HEADER_SIZE; 
-    iov[1].iov_base = (char*)img.data;
-    iov[1].iov_len = TEST_RAW_SIZE;
-
-    //int iovcnt = sizeof(iov) / sizeof(struct iovec);
-
-    ssize_t bytes = 0, recieved_len = 0, remaining_len = iov[0].iov_len;
-    char name[256];
-    int id = 0;
-
-#if 0
-    if (!img.isContinuous()) {
-        img = img.clone();
+    if (sem_init(&(collector.obj_ready), 1, 0) == -1) {
+	    fprintf(stderr, "[cvclient]: can't init shared process semaphore\n");
+	    return -1;
     }
-#endif
 
-    int header_ok = 0;
-    while (1) {
-        if (remaining_len == 0) {
-            fprintf(stdout, "wtf???\n");
-            remaining_len = iov[0].iov_len;
-            continue;
-        }
-#if 0
-        if (!header_ok && recieved_len == 0) {
-            fprintf(stdout, "1\n");
-            bytes = readv(fd, iov, iovcnt);
-        }
-        else 
-#endif
-        if (!header_ok) {
-            fprintf(stdout, "2\n");
-            bytes = read(fd, (char*)iov[0].iov_base + recieved_len, remaining_len);
-        }
-        else {
-            fprintf(stdout, "3: recv = %zd, rem = %zd\n", recieved_len, remaining_len);
-            bytes = read(fd, (char*)iov[1].iov_base + recieved_len, remaining_len);
-        }
-        if (bytes < 0) {
-            fprintf(stdout, "[tcp_capture_data_process]: error while frame_size read\n");
-            break;
-        } 
-        else if (bytes == 0) {
-            continue;
-        }
-        else { 
-            printf("header=%d bytes=%zd recieved=%zd remining=%zd\n", header_ok, bytes, recieved_len, remaining_len);
-            recieved_len += bytes;
-            if (!header_ok && recieved_len < iov[0].iov_len) {
-                remaining_len -= bytes;
-            }
-            if (!header_ok && recieved_len == iov[0].iov_len) {
-                data_size = *((size_t*)iov[0].iov_base);
-                fprintf(stdout, "[tcp_capture_data_process]: found_image_size = %zd\n", data_size);
-                if (data_size != TEST_DATA_SIZE) {
-                    fprintf(stdout, "[tcp_capture_data_process]: strange data size = %zd instead of %zd\n", data_size, TEST_DATA_SIZE);
-                }
-#if 0
-                recieved_len -= iov[0].iov_len;
-                remaining_len = iov[1].iov_len - recieved_len;
-#else
-                recieved_len = 0;
-                remaining_len = data_size;
-#endif
-                header_ok = 1;;
-            }
-            if (header_ok && recieved_len < iov[1].iov_len) {
-                remaining_len -= bytes;
-            }
-            if (header_ok && recieved_len == iov[1].iov_len) {
-                //nextFrameReady(img);
-                if (imgSize != recieved_len) {
-                        fprintf(stdout, "[tcp_capture_data_process]: result size = %zd instead of %zd\n", recieved_len, imgSize);
-                }
-                sprintf(name, "../data/test_%.4d.bmp", id++);
-                cv::imwrite(name, img);
-                remaining_len = iov[0].iov_len;
-                recieved_len = 0;
-                header_ok = 0;
-                fprintf(stdout, "Frame %d is ready\n", id - 1);
-            }
-        }
-    }
+    collect_data_thread(&collector);
 
     close(fd);
     return EXIT_SUCCESS;
