@@ -10,6 +10,40 @@
 #include "filter/cvparams.h"
 #include "filter/cvfilter.h"
 
+void gammaCorrection(cv::Mat &src, cv::Mat &dst, float gamma)
+{
+  unsigned char lut[256];
+  for (int i = 0; i < 256; i++)
+  {
+    lut[i] = cv::saturate_cast<uchar>(pow((float)(i / 255.0), gamma) * 255.0f);
+  }
+  dst = src.clone();
+
+  const int channels = dst.channels();
+  switch (channels)
+  {
+    case 1:
+    {
+      cv::MatIterator_<uchar> it, end;
+      for (it = dst.begin<uchar>(), end = dst.end<uchar>(); it != end; it++)
+      *it = lut[(*it)];
+      break;
+    }
+    case 3:
+    {
+      cv::MatIterator_<cv::Vec3b> it, end;
+      for (it = dst.begin<cv::Vec3b>(), end = dst.end<cv::Vec3b>(); it != end; it++)
+      {
+        (*it)[0] = lut[((*it)[0])];
+        (*it)[1] = lut[((*it)[1])];
+        (*it)[2] = lut[((*it)[2])];
+      }
+      break;
+    }
+  }
+}
+
+
 void prefilterImage(cv::Mat origImage, cv::Mat &prefImage) {
 
     cv::Mat croppedImage = origImage(cv::Rect(0, TEST_CONFIG_H1, TEST_RAW_WIDTH, TEST_CONFIG_H2 - TEST_CONFIG_H1 ));
@@ -17,7 +51,9 @@ void prefilterImage(cv::Mat origImage, cv::Mat &prefImage) {
     cv::Mat greyImage;
     cv::cvtColor(croppedImage, greyImage, cv::COLOR_BGR2GRAY);
 
-    //TODO:adjust_gamma -- gamma correction
+    cv::Mat gammaImage;
+    //TODO:adjust_gamma -- gamma correction  -- use fast pow algorithm from topcon sitara (need to fimd code or write it)
+    gammaCorrection(greyImage, gammaImage, 0.5);
 
     //PY//width = int(frame.shape[1] * self.C["SCALE"] / 100)
     //PY//height = int(frame.shape[0] * self.C["SCALE"] / 100)
@@ -26,7 +62,7 @@ void prefilterImage(cv::Mat origImage, cv::Mat &prefImage) {
 
     cv::Mat resizeImage;
     double scale = TEST_SCALE / 100.;
-    cv::resize(greyImage, resizeImage, cv::Size(greyImage.cols * scale, greyImage.rows * scale));
+    cv::resize(gammaImage, resizeImage, cv::Size(greyImage.cols * scale, greyImage.rows * scale));
 
     cv::Mat thresImage;
     //PY//frame_thresh = cv2.adaptiveThreshold(frame, self.C["MAX_VALUE_THRESH"], cv2.ADAPTIVE_THRESH_GAUSSIAN_C,

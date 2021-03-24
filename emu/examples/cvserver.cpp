@@ -54,7 +54,6 @@ void* tcp_next_image() {
 
 void* generate_data_thread(void *arg) {
     pthread_detach(pthread_self());
-    tcp_test_data_create();
     int *fd = (int*)arg;
     int ln = -1;
     void *buf = NULL;
@@ -207,6 +206,11 @@ int tcp_stream_data_process(char *port){
 }
 
 int main(int argc, char *argv[]){
+    fprintf(stdout, "[tcp_stream_data_process]: prepare data from %s\n", getenv(TEST_SOURCE_PATH_ENV));
+    fflush(stdout);
+    tcp_test_data_create();
+    fprintf(stdout, "[tcp_stream_data_process]: data ready, waitting for connection...\n");
+    fflush(stdout);    
     tcp_stream_data_process(argv[1]);
     return 0;
 }

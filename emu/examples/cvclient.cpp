@@ -16,15 +16,22 @@
 #include <opencv2/highgui.hpp>
 
 #include <semaphore.h>
+#include <pthread.h>
 
 #include "filter/cvparams.h"
 #include "filter/cvfilter.h"
 
 struct obj_collector {
-    int fd;
+    union {
+        int fd;
+        char addr[12];
+        char port[8];
+    };
     int exit_flag;
     sem_t obj_ready;
-    int obj_id;
+    pthread_t thread_id;
+    //??? may be with mutex
+    int frames_cnt;
 };
 
 void *collect_data_thread(void *arg){
@@ -39,7 +46,7 @@ void *collect_data_thread(void *arg){
     
     char header[TEST_HEADER_SIZE];
     size_t  data_size = 0;
-    int frame_id = 0;
+    int frame_id = -1;
     struct iovec iov[2];
     
     iov[0].iov_base = (char*)header; //(size_t*)&data_size;
@@ -60,6 +67,12 @@ void *collect_data_thread(void *arg){
 #endif
 
     int header_ok = 0;
+
+    int frames_obj_cnt = 0;
+    int frames_empty_cnt = 0;
+    int frames_non_cnt = 0;
+    int new_object = 0;
+
     while (!(*exit_flag)) {
         if (remaining_len == 0) {
             //fprintf(stdout, "wtf???\n");
@@ -87,6 +100,7 @@ void *collect_data_thread(void *arg){
             break;
         } 
         else if (bytes == 0) {
+            usleep(1000);
             continue;
         }
         else { 
@@ -97,7 +111,7 @@ void *collect_data_thread(void *arg){
             }
             if (!header_ok && recieved_len == iov[0].iov_len) {
                 data_size = *((size_t*)iov[0].iov_base);
-                collector->obj_id = *((int*)((char*)iov[0].iov_base + sizeof(size_t)));
+                frame_id = *((int*)((char*)iov[0].iov_base + sizeof(size_t)));
                 //fprintf(stdout, "[tcp_capture_data_process]: found_image_size = %zd found_frame_id = %d\n", data_size, frame_id);
                 if (data_size != TEST_DATA_SIZE) {
                     fprintf(stdout, "[tcp_capture_data_process]: strange data size = %zd instead of %zd\n", data_size, TEST_DATA_SIZE);
@@ -120,14 +134,39 @@ void *collect_data_thread(void *arg){
                 }
 //------------------------------------------------------------------------------------
                 float radius = findRadius(img);
-                //sem_post(&collector->obj_ready);
+                //not smart algotithm of object detection
+                //fprintf(stdout, "[tcp_capture_data_process]: frames_obj_cnt = %d frames_empty_cnt %d frames_non_cnt %d\n", frames_obj_cnt, frames_empty_cnt, frames_non_cnt);
+                if (radius < 135 && new_object == 0) {
+                    frames_empty_cnt++;
+                    if (frames_obj_cnt >= 16 && frames_empty_cnt >= 8) {
+                        new_object = 1;
+                        fprintf(stdout, "[tcp_capture_data_process]: object break is detected after %d frames\n", frames_empty_cnt + frames_obj_cnt + frames_non_cnt);
+                        //finalize current full object
+                        sem_post(&collector->obj_ready);
+                        //prepare new empty object
+                        new_object = 0;
+                        frames_obj_cnt = 0; 
+                        frames_non_cnt = 0;
+                        frames_empty_cnt = 0;
+                    }
+                }
+                else if (radius >= 150){
+                   frames_obj_cnt++;
+                   frames_obj_cnt += frames_empty_cnt;
+                   frames_empty_cnt = 0;
+                   frames_obj_cnt += frames_non_cnt;
+                   frames_non_cnt = 0;
+                }
+                else {
+                    frames_non_cnt++;
+                }
 //-------------------------------------------------------------------------------------
-                sprintf(name, "../data/test_%.4d.bmp", id++);
+                //sprintf(name, "../data/test_%.4d.bmp", id);
                 //cv::imwrite(name, img);
                 remaining_len = iov[0].iov_len;
                 recieved_len = 0;
                 header_ok = 0;
-                fprintf(stdout, "Frame %d is ready, radius = %f \n", id - 1, radius);
+                fprintf(stdout, "Frame %d with frame_id %d is ready, radius = %f \n", id++, frame_id, radius);
             }
         }
     }
@@ -136,11 +175,17 @@ void *collect_data_thread(void *arg){
     return NULL;
 }
 
-int tcp_capture_data_process(char* addr, char *port) {
-    int			fd;
+struct obj_collector *collector_init(char* addr, char *port) {
+    struct obj_collector *collector = (struct obj_collector *)malloc(sizeof(struct obj_collector));
+    if (!collector) {
+        fprintf(stderr, "[collector_init]: can't allocte collector\n");
+        fflush(stderr);
+        return NULL;
+    }
+
     struct addrinfo	hints;
     struct addrinfo	*result, *rp;
-    int			rc;
+    int rc, fd;
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;     //IPv4 && IPv6
@@ -150,43 +195,62 @@ int tcp_capture_data_process(char* addr, char *port) {
 
     rc = getaddrinfo(addr, port, &hints, &result);
     if (rc != 0) {
-			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
-			exit(EXIT_FAILURE);
+	    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+	    return NULL;
     }
 
     for (rp = result; rp != NULL; rp = rp->ai_next) {
-			fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-			if (fd == -1) continue;
-			if (connect(fd, rp->ai_addr, rp->ai_addrlen) != -1) break;
-			close(fd);
+	    fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+	    if (fd == -1) continue;
+	    if (connect(fd, rp->ai_addr, rp->ai_addrlen) != -1) break;
+	    close(fd);
     }
 
    	if (rp == NULL) {
-			fprintf(stderr, "Could not connect\n");
-			exit(EXIT_FAILURE);
+	    fprintf(stderr, "Could not connect\n");
+	    return NULL;
     }
 
     freeaddrinfo(result);
+
+    strcpy(collector->addr, addr);
+    strcpy(collector->port, port);
+    collector->fd = fd;
+    collector->exit_flag = 0;
     
-    struct obj_collector collector;
-    collector.obj_id = 0;
-    collector.fd = fd;
-    collector.exit_flag = 0;
-    
-    if (sem_init(&(collector.obj_ready), 1, 0) == -1) {
-	    fprintf(stderr, "[cvclient]: can't init shared process semaphore\n");
-	    return -1;
+    if (sem_init(&(collector->obj_ready), 1, 0) == -1) {
+	    fprintf(stderr, "[cvclient]: can't init object collector semaphore\n");
+	    return NULL;
     }
 
-    collect_data_thread(&collector);
+    pthread_create(&collector->thread_id, NULL, collect_data_thread, collector);
 
-    close(fd);
-    return EXIT_SUCCESS;
+    return collector;
 }
 
+void collector_destroy(struct obj_collector *collector){
+    collector->exit_flag = 1;
+    pthread_join(collector->thread_id, NULL);
+    close(collector->fd);
+    //TODO: when sem_wait???
+    free(collector);
+}
 
 int main(int argc, char *argv[]){
-    tcp_capture_data_process(argv[1], argv[2]);
+    int obj_id = 0;
+    //TODO: array of collectors
+    struct obj_collector *collector = collector_init(argv[1], argv[2]);
+    if (!collector) {
+        fprintf(stdout, "[cvclient]: Can't init collector, may be camera isn't ready. Please, try again.\n");
+        fflush(stdout);
+        return 0;
+    }
+    while (!collector->exit_flag) {
+        sem_wait(&collector->obj_ready);
+        fprintf(stdout, "[cvclient]: New object %d ready\n", obj_id++);
+        fflush(stdout);
+    }
+    if (collector) collector_destroy(collector);
     return 0;
 }
 
