@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.17)
 
-set(PROJECT_NAME "emu")
+set(PROJECT_NAME "cvcamera")
 
 project(${PROJECT_NAME}
     DESCRIPTION "Opencv camera and client with opencv filter for this one"
-    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/emu"
+    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/camera"
     LANGUAGES C CXX)
 
 ###############################################################################
@@ -31,20 +31,24 @@ find_package(OpenCV REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
     #headers
-    include/filter/cvfilter.h
-    include/filter/cvparams.h
+    include/${PROJECT_NAME}/cvcamera.h
+    include/${PROJECT_NAME}/cvcollector.h
+    include/${PROJECT_NAME}/cvgenerator.h
     #sources
-    src/cvfilter.cpp
+    src/cvcollector.cpp
+    src/cvgenerator.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} opencv_core opencv_highgui opencv_imgproc)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/cvfilter/include)
+target_link_libraries(${PROJECT_NAME} opencv_core opencv_highgui opencv_imgproc -pthread cvfilter)
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
-    include/${PROJECT_NAME}/cvfilter.h
-    include/${PROJECT_NAME}/cvparams.h
+    include/${PROJECT_NAME}/cvcamera.h
+    include/${PROJECT_NAME}/cvcollector.h
+    include/${PROJECT_NAME}/cvgenerator.h
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES 
+set_target_properties(${PROJECT_NAME} PROPERTIES
     PUBLIC_HEADER "{${PROJECT_NAME}_PUBLIC_HEADERS}"
 )
 
@@ -53,44 +57,41 @@ target_include_directories (${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-add_executable(cvtest examples/cvtest.cpp)
-target_link_libraries(cvtest opencv_core opencv_highgui)
-
-add_executable(cvfilter examples/cvradius.cpp)
-target_link_libraries(cvfilter opencv_core opencv_highgui opencv_imgproc ${PROJECT_NAME})
+#add_executable(cvtest examples/cvtest.cpp)
+#target_link_libraries(cvtest opencv_core opencv_highgui)
 
 #add_executable(cvdata examples/cvdata.cpp)
 #target_link_libraries(cvdata opencv_core opencv_highgui)
 
-add_executable(cvcamera examples/cvserver.cpp)
-target_link_libraries(cvcamera opencv_core opencv_highgui -pthread ${PROJECT_NAME})
+add_executable(cvserver tools/cvserver.cpp)
+target_link_libraries(cvserver -pthread ${PROJECT_NAME})
 
-add_executable(cvcapture examples/cvclient.cpp)
-target_link_libraries(cvcapture opencv_core opencv_highgui ${PROJECT_NAME} -pthread)
+add_executable(cvclient tools/cvclient.cpp)
+target_link_libraries(cvclient -pthread ${PROJECT_NAME})
 
 ###############################################################################
 # Tests
 ###############################################################################
 
-enable_testing()
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIR})
+#enable_testing()
+#find_package(GTest REQUIRED)
+#include_directories(${GTEST_INCLUDE_DIR})
 
-set(PROJECT_TESTS ${PROJECT_NAME}-tests)
+#set(PROJECT_TESTS ${PROJECT_NAME}-tests)
 
-add_executable(${PROJECT_TESTS}
-    tests/FilterTests.cpp
-)
+#add_executable(${PROJECT_TESTS}
+#    tests/FilterTests.cpp
+#)
 
 #add_executable(${PROJECT_TESTS}
 #    tests/filter_tests.c
 #)
 
-target_link_libraries(${PROJECT_TESTS}
-    ${GTEST_BOTH_LIBRARIES} pthread
-    opencv_core opencv_highgui
-    ${PROJECT_NAME}
-)
+#target_link_libraries(${PROJECT_TESTS}
+#    ${GTEST_BOTH_LIBRARIES} pthread
+#    opencv_core opencv_highgui
+#    ${PROJECT_NAME}
+#)
 
 #add_test(${PROJECT_TESTS} ${PROJECT_TESTS})
-add_test(NAME ${PROJECT_TESTS} COMMAND $<TARGET_FILE:${PROJECT_TESTS}>)
+#add_test(NAME ${PROJECT_TESTS} COMMAND $<TARGET_FILE:${PROJECT_TESTS}>)

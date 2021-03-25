@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -7,7 +5,7 @@
 
 #include <iostream>
 
-#include "filter/cvfilter.h"
+#include "cvfilter/cvfilter.h"
 
 int main() {
     cv::Mat orig = cv::imread("../data/pencil_frames_5/10.jpg", cv::IMREAD_ANYDEPTH |

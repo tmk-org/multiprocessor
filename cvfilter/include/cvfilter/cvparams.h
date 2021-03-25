@@ -1,0 +1,12 @@
+#ifndef _CV_PARAMS_H_
+#define _CV_PARAMS_H_
+
+#define TEST_CONFIG_H2 810
+#define TEST_CONFIG_H1 350
+#define TEST_MAX_VALUE_THRESH 255
+#define TEST_BLOCK_SIZE_THRESH 35
+#define TEST_C_THRESH 5
+#define TEST_SCALE 50
+#define TEST_GAMMA 1.0
+
+#endif //_CV_PARAMS_H_

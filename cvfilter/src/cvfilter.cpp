@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "filter/cvparams.h"
-#include "filter/cvfilter.h"
+#include "cvfilter/cvparams.h"
+#include "cvfilter/cvfilter.h"
 
 void gammaCorrection(cv::Mat &src, cv::Mat &dst, float gamma)
 {
@@ -46,14 +46,14 @@ void gammaCorrection(cv::Mat &src, cv::Mat &dst, float gamma)
 
 void prefilterImage(cv::Mat origImage, cv::Mat &prefImage) {
 
-    cv::Mat croppedImage = origImage(cv::Rect(0, TEST_CONFIG_H1, TEST_RAW_WIDTH, TEST_CONFIG_H2 - TEST_CONFIG_H1 ));
+    cv::Mat croppedImage = origImage(cv::Rect(0, TEST_CONFIG_H1, origImage.cols, TEST_CONFIG_H2 - TEST_CONFIG_H1 ));
 
     cv::Mat greyImage;
     cv::cvtColor(croppedImage, greyImage, cv::COLOR_BGR2GRAY);
 
     cv::Mat gammaImage;
-    //TODO:adjust_gamma -- gamma correction  -- use fast pow algorithm from topcon sitara (need to fimd code or write it)
-    gammaCorrection(greyImage, gammaImage, 0.5);
+    //adjust_gamma -- gamma correction  //TODO: use fast pow algorithm from topcon sitara (need to find code or write it)
+    gammaCorrection(greyImage, gammaImage, TEST_GAMMA);
 
     //PY//width = int(frame.shape[1] * self.C["SCALE"] / 100)
     //PY//height = int(frame.shape[0] * self.C["SCALE"] / 100)
