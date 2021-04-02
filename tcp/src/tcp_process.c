@@ -45,7 +45,7 @@ char *defaultExecuteCommand(const char *buf, int *exit_flag) {
     }
     return strdup("OK\n");
 }
-
+/*
 char *getRequest() {
     static char s[80];
     fprintf(stdout, "Message: ");
@@ -55,7 +55,7 @@ char *getRequest() {
 	strcat(s, "\n");
     return s;
 }
-
+*/
 int checkReply(char *buf) {
     if (buf != NULL) {
         return 0;
@@ -451,7 +451,7 @@ int tcp_client_process(char* addr, char *port){
 		    strcpy(reply, s);
 		}
 
-		printf("server reply: %s\n", reply);
+		parseReply(reply); //printf("server reply: %s\n", reply);
     }
 
     close(fd);
