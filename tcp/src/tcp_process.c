@@ -45,17 +45,7 @@ char *defaultExecuteCommand(const char *buf, int *exit_flag) {
     }
     return strdup("OK\n");
 }
-/*
-char *getRequest() {
-    static char s[80];
-    fprintf(stdout, "Message: ");
-    fflush(stdout);
-	memset(s, 0, sizeof(s));
-	scanf("%78[^\n]%*c", s);
-	strcat(s, "\n");
-    return s;
-}
-*/
+
 int checkReply(char *buf) {
     if (buf != NULL) {
         return 0;
@@ -388,7 +378,7 @@ int tcp_server_with_command_queue_process(char *port) {
 
 #endif
 
-int tcp_client_process(char* addr, char *port){
+int tcp_client_process(char* addr, char *port, void (*parseReply) (char *), const char *(*getRequest) ()){
     int			fd;
     struct addrinfo	hints;
     struct addrinfo	*result, *rp;

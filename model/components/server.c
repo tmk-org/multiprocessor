@@ -12,7 +12,6 @@
 #include "tcp/tcp_process.h"
 #include "model/command_server.h"
 #include "model/model.h"
-void parseReply(char *c){}; const char *getRequest() {return NULL;}; // it is for tcp, need to do something in tcp_process.c about it
 
 void usage(char *pname) {
     fprintf(stderr, "Usage: %s /shmpath\n", pname);

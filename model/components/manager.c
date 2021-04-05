@@ -61,9 +61,9 @@ int main(int argc, char *argv[]) {
 
     /* both clients (should?) use these handlers */
 #if defined NONBLOCK_INPUT
-    tcp_client_with_select_process(argv[1], argv[2]); // , parseReply, getRequest);
+    tcp_client_with_select_process(argv[1], argv[2]);
 #else
-    tcp_client_process(argv[1], argv[2]); // , parseReply, getRequest);
+    tcp_client_process(argv[1], argv[2], parseReply, getRequest);
 #endif
 
      /* TODO add operator delete for "configuration var" from c++, NOT func free() */

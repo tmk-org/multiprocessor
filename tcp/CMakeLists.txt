@@ -39,13 +39,11 @@ target_include_directories (${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-# Doesn't work without defining parseReply and getRequest !!!
+add_executable(tcp_server examples/server.c)
+target_link_libraries(tcp_server tcp)
 
-#add_executable(tcp_server examples/server.c)
-#target_link_libraries(tcp_server tcp)
-
-#add_executable(tcp_client examples/client.c)
-#target_link_libraries(tcp_client tcp)
+add_executable(tcp_client examples/client.c)
+target_link_libraries(tcp_client tcp)
 
 ###############################################################################
 # Tests
