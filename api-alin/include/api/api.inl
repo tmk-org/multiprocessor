@@ -1,0 +1,44 @@
+#if !defined(API_FUNC) && !defined(API_SWITCH)
+#  error You need to define API_FUNC or API_SWITCH macro
+#else
+
+#if defined(API_FUNC)
+
+API_FUNC(Uninited)
+API_FUNC(Init)
+API_FUNC(Start)
+API_FUNC(Finish)
+API_FUNC(Status)
+API_FUNC(Grab)
+API_FUNC(Live)
+API_FUNC(Control)
+API_FUNC(Clean)
+API_FUNC(Stop)
+
+#undef API_FUNC
+
+#else
+
+enum __api_switch_type {
+    __API_SWITCH_TYPE_UNKNOWN_UNKNOWN,
+    __API_SWITCH_TYPE_UNKNOWN_OK,
+    __API_SWITCH_TYPE_OK_UNKNOWN,
+    __API_SWITCH_TYPE_OK_OK
+};
+
+API_SWITCH(uninited, Uninited, UNINITED, __API_SWITCH_TYPE_UNKNOWN_UNKNOWN)
+API_SWITCH(init, Init, INIT, __API_SWITCH_TYPE_UNKNOWN_OK)
+API_SWITCH(start, Start, START, __API_SWITCH_TYPE_UNKNOWN_OK)
+API_SWITCH(finish, Finish, FINISH, __API_SWITCH_TYPE_UNKNOWN_OK)
+API_SWITCH(status, Status, STATUS, __API_SWITCH_TYPE_OK_OK)
+API_SWITCH(grab, Grab, GRAB, __API_SWITCH_TYPE_OK_UNKNOWN)
+API_SWITCH(live, Live, LIVE, __API_SWITCH_TYPE_UNKNOWN_UNKNOWN)
+API_SWITCH(control, Control, CONTROL, __API_SWITCH_TYPE_UNKNOWN_UNKNOWN)
+API_SWITCH(clean, Clean, CLEAN, __API_SWITCH_TYPE_UNKNOWN_OK)
+API_SWITCH(stop, Stop, STOP, __API_SWITCH_TYPE_OK_OK)
+
+#undef API_SWITCH
+
+#endif
+
+#endif

@@ -13,7 +13,6 @@
 #include "model/command_server.h"
 #include "model/model.h"
 
-
 void usage(char *pname) {
     fprintf(stderr, "Usage: %s /shmpath\n", pname);
 }
@@ -30,7 +29,7 @@ struct manager_params *parse_command_line(int argc, char *argv[]){
 #if 0
     if (argc < 2) {
         usage(argv[0]);
-	    exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
 #endif
     struct manager_params *mngr = malloc(sizeof(struct manager_params));
@@ -52,14 +51,14 @@ static char *executeCommand(const char *cmd, int *exit_flag) {
         fflush(stdout);
         *exit_flag = 1;
     }
-      // Create command and add into queue
-      command_t *new_cmd = (command_t *)malloc(sizeof(command_t));
-      memset(new_cmd, 0, sizeof(command_t));
-      strcpy(new_cmd->full_command, cmd);
-      //new_comm->fd = fd;  --- in the tcp_process
-      fprintf(stdout, "Put to queue new command: '%s'\n", new_cmd->full_command);
-      fflush(stdout);
-      add_command(new_cmd);
+    // Create command and add into queue
+    command_t *new_cmd = (command_t *)malloc(sizeof(command_t));
+    memset(new_cmd, 0, sizeof(command_t));
+    strcpy(new_cmd->full_command, cmd);
+    //new_comm->fd = fd;  --- in the tcp_process
+    fprintf(stdout, "Put to queue new command: '%s'\n", new_cmd->full_command);
+    fflush(stdout);
+    add_command(new_cmd);
     return strdup("OK\n");
 }
 
