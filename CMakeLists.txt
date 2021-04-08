@@ -59,7 +59,8 @@ endif()
 ###############################################################################
 
 add_subdirectory(misc)
-add_subdirectory(api)
+#add_subdirectory(api)
+add_subdirectory(api-alin)
 add_subdirectory(tcp)
 add_subdirectory(config)
 add_subdirectory(pmngr)

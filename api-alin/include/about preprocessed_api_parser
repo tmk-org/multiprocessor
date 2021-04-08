@@ -1,0 +1,3 @@
+generated: g++ --std=c++17 -I. -E ./api/api_parser.h -o preprocessed_api_parser.c
+
+line 4711 -- switch case expansion
