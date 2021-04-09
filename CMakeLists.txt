@@ -68,8 +68,8 @@ add_subdirectory(streamer)
 add_subdirectory(model)
 add_subdirectory(cvfilter)
 add_subdirectory(cvcamera)
-add_subdirectory(libstorage)
-add_subdirectory(storage_interface)
+#add_subdirectory(libstorage)
+#add_subdirectory(storage_interface)
 
 ###############################################################################
 # Tests
