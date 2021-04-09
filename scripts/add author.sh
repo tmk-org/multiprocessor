@@ -16,7 +16,7 @@ sign="//-----------------------------------------------------------------------
 
 # TODO add /* */ support
 alin_delete_previous() {
-    ans="$1"
+    ans="""$1"""
     a=$(echo "$ans" | head -1)
     while [ -z "$a" -o "$a" = "`echo "$a" | grep "//.*"`" ]
     do
@@ -39,7 +39,7 @@ alin_walk_and_sign() {
         then
             echo "adding sign to $sub"
             contents=$(cat $sub)
-            contents=$(alin_delete_previous "$contents")
+            contents=$(alin_delete_previous """$contents""")
             echo "$sign$contents" > "$sub"
         fi
     done

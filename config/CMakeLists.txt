@@ -40,6 +40,6 @@ enable_testing()
 #find_package(GTest REQUIRED)
 #include_directories(${GTEST_INCLUDE_DIR})
 add_executable(config_test tests/config_test.cpp)
-target_link_libraries(config_test gmock gtest pthread gtest gtest_main) #${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARIES}
+target_link_libraries(config_test gtest pthread gtest gtest_main) #${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARIES}
 target_link_libraries(config_test ${PROJECT_NAME})
 #add_test(config_test config_test)

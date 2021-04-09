@@ -14,8 +14,7 @@ extern "C" {
 #define API_FUNC(name) \
 void api##name(const char *cmd, int *exit_flag); \
 /*{ \
-    fprintf(stdout, "[API]: Received unknown command '%s'
-", cmd); \
+    fprintf(stdout, "[API]: Received unknown command '%s'", cmd); \
     fflush(stdout); \
     return; \
 }*/
@@ -63,13 +62,11 @@ static int regInit = 0;
 
 char *executeAPICommand(const char *request, int *exit_flag) {
     char *cmdStr, *reply = NULL;
-    printf("[API] REQUEST: %s
-", request);
+    printf("[API] REQUEST: %s", request);
     if (regInit == 0) {
         int res = regcomp(&cmdRegEx, cmdRegTemplate, REG_EXTENDED);
         if (res != 0) {
-            printf("Wrong template
-");
+            printf("Wrong template");
             return 0;
         }
         regInit = 1;
@@ -81,8 +78,7 @@ char *executeAPICommand(const char *request, int *exit_flag) {
     }
     
     int clientId = (parts[2].rm_eo - parts[2].rm_so > 0) ? (request[parts[2].rm_so + strlen("/client/")] - '0') : 0;
-    //printf("[API] Request: %s
-", strndup(&request[parts[3].rm_so], parts[3].rm_eo - parts[3].rm_so));
+    //printf("[API] Request: %s", strndup(&request[parts[3].rm_so], parts[3].rm_eo - parts[3].rm_so));
 
     #define API_SWITCH(name, Name, NAME, type)                                    \
     /* API_##NAME */                                                              \
@@ -120,8 +116,7 @@ char *executeAPICommand(const char *request, int *exit_flag) {
         return reply;
     }
 
-    printf("Executed %s:
-", cmdStr);
+    printf("Executed %s:", cmdStr);
     
     if (!reply) asprintf(&reply,"ER011{%d,,empty answer}", currCmd);
 
