@@ -6,11 +6,12 @@
 #ifndef CONFIG_H 
 #define CONFIG_H
 
-#include "model/module_t.h" // struct module_t definition
+#include "config/module_description.h" // struct module_t definition
 
 #ifdef __cplusplus
 extern "C"
 #endif
+//int model_read_configuration(const char *fileName, module_t **target);
 int create_config(const char *fileName, module_t **target);
 
 #endif

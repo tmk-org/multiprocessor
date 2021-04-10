@@ -31,6 +31,7 @@ include_directories(${CMAKE_SOURCE_DIR}/../misc/include)
 include_directories(${CMAKE_SOURCE_DIR}/../shmem/include)
 include_directories(${CMAKE_SOURCE_DIR}/../tcp/include)
 include_directories(${CMAKE_SOURCE_DIR}/../pmngr/include)
+include_directories(${CMAKE_SOURCE_DIR}/../config/include)
 
 add_library(${PROJECT_NAME} SHARED
     #header
@@ -41,7 +42,7 @@ add_library(${PROJECT_NAME} SHARED
     src/model.c
 )
 
-target_link_libraries(${PROJECT_NAME} misc shmem pmngr tcp)
+target_link_libraries(${PROJECT_NAME} misc shmem pmngr tcp config)
 
 target_include_directories (${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

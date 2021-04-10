@@ -13,6 +13,7 @@ inline void throw_wrong_type_error(const std::string which, const std::string re
     throw std::logic_error("Wrong type of " + which + ", should be " + should + ", but is " + real);
 }
 
+//int model_read_configuration(const char *fileName, module_t **target);
 int create_config(const char *fileName, module_t **target) {
     if (!fileName || fileName[0] == '\0') {
         std::cout << "Empty string instead of fileName(.json)" << std::endl;
@@ -60,21 +61,32 @@ int create_config(const char *fileName, module_t **target) {
                 strcpy(modules[i].argv[j], params[j - 1].c_str());
             }
             if (!(*it)["next_id"].is_null()) {
+#if 0
                 modules[i].next = &modules[(*it)["next_id"].get<int>()];
+#else
+                modules[i].next = (*it)["next_id"].get<int>();
+#endif
                 if ((*it)["type"] == "LAST") {
                     throw_wrong_type_error(*it, (*it)["type"], "MIDDLE");
                 }
+                modules[i].type = MT_MIDDLE;
             } else {
+#if 0
                 modules[i].next = NULL;
+#else
+                modules[i].next = -1;
+#endif
                 if ((*it)["type"] != "LAST") {
                     throw_wrong_type_error(*it, (*it)["type"], "LAST");
                 }
+                modules[i].type = MT_LAST;
             }
             if ((*it)["type"] == "FIRST") {
                 if (first != -1) {
                     throw_wrong_type_error(*it, (*it)["type"], "MIDDLE");
                 }
                 first = i;
+                modules[i].type = MT_FIRST;
             }
         } catch (std::logic_error e) {
             std::cout << "Invalid json file " << fileName << std::endl;

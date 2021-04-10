@@ -26,9 +26,30 @@ int executeAPICommand(const char *cmd, int *exit_flag) {
     else if (strcasecmp(cmd, "INIT\n") == 0 || strcasecmp(cmd, "I\n") == 0) { 
         fprintf(stdout, "[command_server]: INIT command recieved\n");
         fflush(stdout);
-        mdesc = model_init();
+        mdesc = model_init(NULL);
         if (mdesc == NULL) {
             fprintf(stdout, "[command_server]: command '%s' failed\n", cmd);
+            fflush(stdout);
+        }
+    } 
+    else if (strcasecmp(cmd, "CONFIG\n") == 0 || strcasecmp(cmd, "C\n") == 0) { 
+        char fname[255];
+        fprintf(stdout, "[command_server]: INIT command recieved\n");
+        fflush(stdout);
+        //waits on input is not good idea for any server solution
+        //it waits IN the SERVER terminal and get answer too...
+        //TODO: use api which can support parameters as filename with the path
+        fprintf(stdout, "[command_server]: input model configuration filename\n");        
+        scanf("%s", fname);
+        mdesc = model_init(fname);
+        if (mdesc == NULL) {
+            fprintf(stdout, "[command_server]: command '%s' failed\n", cmd);
+            fflush(stdout);
+        }
+        else {
+            //TODO: make callback
+            //we needed in callback on reply after init because this reply is not informative about real status
+            fprintf(stdout, "[command_server]: starting model from %s...\n", cmd, fname);
             fflush(stdout);
         }
     } 
