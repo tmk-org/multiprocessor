@@ -13,7 +13,7 @@ typedef char *(*execute_command_func_t) (const char *command, int *exit_flag);
 //OR int tcp_server_process(char *port, execute_command_func_t exec_cmd);
 int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *exit_flag));
 
-int tcp_client_process(char* addr, char *port);
+int tcp_client_process(char* addr, char *port, void (*parseReply) (char *), const char *(*getRequest) ());
 int tcp_client_with_select_process(char* addr, char *port);
 
 #ifdef __cplusplus
