@@ -11,7 +11,7 @@ project(${PROJECT_NAME}
 add_library(${PROJECT_NAME} SHARED
     #headers
     include/${PROJECT_NAME}/config.h
-    ../model/include/model/module_t.h
+    include/${PROJECT_NAME}/module_description.h
     #sources
     src/config.cpp
 )
@@ -42,4 +42,4 @@ enable_testing()
 add_executable(config_test tests/config_test.cpp)
 target_link_libraries(config_test gtest pthread gtest gtest_main) #${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARIES}
 target_link_libraries(config_test ${PROJECT_NAME})
-#add_test(config_test config_test)
+#add_test(config-test config_test)
