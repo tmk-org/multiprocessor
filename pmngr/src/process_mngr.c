@@ -100,15 +100,14 @@ int process_start(char *argv[]) {
     #if 0
         int i = 0;
 	    while (argv[i] != NULL ){
-            fprintf(stdout, "argv[%d] = %s\n", i, argv[i]);
+            printf("argv[%d] = %s\n", i, argv[i]);
             i++;
 	    }
-	    fflush(stdout);
     #endif
 
 	    execv(argv[0], argv);
-	    fprintf(stderr, "[process_mngr]: can't exec child process %s: errno=%d, %s\n",
-		    argv[0], errno, strerror(errno));
+	    fprintf(stderr, "[process_mngr]: can't exec child process: errno=%d, %s\n",
+		    errno, strerror(errno));
 	    return -1;
     }
     process_info[id].pid = pid;
