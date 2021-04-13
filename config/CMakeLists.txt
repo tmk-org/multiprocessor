@@ -8,6 +8,8 @@ project(${PROJECT_NAME}
     LANGUAGES C CXX
 )
 
+find_package(Glog REQUIRED)
+
 add_library(${PROJECT_NAME} SHARED
     #headers
     include/${PROJECT_NAME}/config.h
@@ -34,6 +36,7 @@ target_include_directories (${PROJECT_NAME} PUBLIC
 )
 
 #target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} glog::glog)
 
 # Test
 enable_testing()
@@ -41,5 +44,6 @@ enable_testing()
 #include_directories(${GTEST_INCLUDE_DIR})
 add_executable(config_test tests/config_test.cpp)
 target_link_libraries(config_test gtest pthread gtest gtest_main) #${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARIES}
+#target_link_libraries(config_test)
 target_link_libraries(config_test ${PROJECT_NAME})
 #add_test(config-test config_test)
