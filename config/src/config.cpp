@@ -13,7 +13,6 @@ inline void throw_wrong_type_error(const std::string which, const std::string re
     throw std::logic_error("Wrong type of " + which + ", should be " + should + ", but is " + real);
 }
 
-//int model_read_configuration(const char *fileName, module_t **target);
 int create_config(const char *fileName, module_t **target) {
     if (!fileName || fileName[0] == '\0') {
         std::cout << "Empty string instead of fileName(.json)" << std::endl;

@@ -11,7 +11,7 @@
 #ifdef __cplusplus
 extern "C"
 #endif
-//int model_read_configuration(const char *fileName, module_t **target);
+
 int create_config(const char *fileName, module_t **target);
 
 #endif
