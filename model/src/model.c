@@ -194,9 +194,9 @@ void out_configuration(int modules_count, struct module_description *description
 }
 #endif
 
-int model_read_configuration(char *fname, struct module **p_modules) {
+int model_read_configuration_(char *fname, struct module **p_modules) {
     struct module_description *descriptions;
-    int modules_count = create_config(fname, &descriptions);
+    int modules_count = model_read_configuration(fname, &descriptions);
     out_configuration(modules_count, descriptions);
     //TODO: make normal name for this function 
     //mdesc->modules_count = model_description_read(fname, &descriptions);
@@ -315,7 +315,7 @@ struct model_desc *model_init(char *fname) {
         mdesc->shmem = shmem;
         shared_memory_setenv(mdesc->shmpath, shmem);
         if (fname) {
-            mdesc->modules_count = model_read_configuration(fname, &(mdesc->modules));
+            mdesc->modules_count = model_read_configuration_(fname, &(mdesc->modules));
         }
         else {
             mdesc->modules_count = model_default_configuration(&(mdesc->modules));

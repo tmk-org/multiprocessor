@@ -2,20 +2,50 @@
 
 #include <nlohmann/json.hpp>
 
-#include <iostream> // for debug info, sorry
+//#include <iostream>
+#include <glog/logging.h>
+
 #include <fstream>
 #include <string>
 #include <string.h>
 
 using json = nlohmann::json;
 
+#define CONFIG_EXTRA_CHECK
+
+#ifdef CONFIG_CHECK
+#define CHECK_FAIL \
+LOG(ERROR) << "Ill-formed json file " << std::endl; \
+return -1;
+
+int dfs_check(module_t **modules, bool *was, int size, int now) {
+    if (now < -1 || now >= size) { // out of range
+        CHECK_FAIL;
+    }
+    if (was[now] == 1) { // loop found
+        CHECK_FAIL;
+    }
+    was[now] = 1;
+    if ((*modules)[now].next == -1) {
+        for (int i = 0; i < size; ++i) {
+            if (was[i] == 0) { // we will never start this module
+                CHECK_FAIL;
+            }
+        }
+        // all good
+        return 0;
+    }
+    return dfs_check(modules, was, size, (*modules)[now].next);
+}
+#endif
+
 inline void throw_wrong_type_error(const std::string which, const std::string real, const std::string should) {
     throw std::logic_error("Wrong type of " + which + ", should be " + should + ", but is " + real);
 }
 
-int create_config(const char *fileName, module_t **target) {
+int model_read_configuration(const char *fileName, module_t **target) {
     if (!fileName || fileName[0] == '\0') {
-        std::cout << "Empty string instead of fileName(.json)" << std::endl;
+        LOG(ERROR) << "Empty string instead of fileName(.json)" << std::endl;
         return -1;
     }
 
@@ -23,22 +53,22 @@ int create_config(const char *fileName, module_t **target) {
 
     /* no file */
     if (!jsonFile.is_open() || !jsonFile.good()) {
-        std::cout << "Failed to open " << fileName << std::endl;
+        LOG(ERROR) << "Failed to open " << fileName << std::endl;
         return -1;
     }
 
     json jsonObj;
     try {
         jsonFile >> jsonObj;
-    } catch (std::logic_error e) {
-        std::cout << "Failed parse json file " << fileName << std::endl;
+    } catch (std::logic_error &e) {
+        LOG(ERROR) << "Failed parse json file " << fileName << std::endl;
         jsonFile.close();
         return -1;
     }
     jsonFile.close();
 
     /* now create & fill */
-    module_t *modules = new module_t[jsonObj.size()]; // TODO add operator delete somewhere
+    module_t *modules = static_cast<module_t *>(malloc(sizeof(module_t) * jsonObj.size()));
     json::iterator it = jsonObj.begin(); // iterator
     int first = -1; // for checking
     for (int i = 0; it != jsonObj.end(); ++it, ++i) {
@@ -49,32 +79,24 @@ int create_config(const char *fileName, module_t **target) {
                  (*it)["parameters"].get<std::vector<std::string>>();
             const int has_name = ((*it)["name"].is_null()? 0 : 1);
             const int p_size = params.size(); // shorter naming
-            modules[i].argv = new char*[p_size + 1 + has_name]; // TODO add operator delete somewhere
+            modules[i].argv = static_cast<char **>(malloc(sizeof(char*) * (p_size + 1 + has_name)));
             if (has_name == 1) {
-                modules[i].argv[0] = new char[(*it)["name"].get<std::string>().size()];
+                modules[i].argv[0] = static_cast<char *>(malloc(sizeof(char) * (*it)["name"].get<std::string>().size()));
                 strcpy(modules[i].argv[0], (*it)["name"].get<std::string>().c_str()); // name of module as first parameter
             }
             modules[i].argv[p_size + has_name] = NULL; // NULL as last parameter
             for (int j = has_name; j < p_size + has_name; ++j) {
-                modules[i].argv[j] = new char[params[j - 1].size()]; // TODO add operator delete somewhere
+                modules[i].argv[j] = static_cast<char *>(malloc(sizeof(char) * params[j - 1].size()));
                 strcpy(modules[i].argv[j], params[j - 1].c_str());
             }
             if (!(*it)["next_id"].is_null()) {
-#if 0
-                modules[i].next = &modules[(*it)["next_id"].get<int>()];
-#else
                 modules[i].next = (*it)["next_id"].get<int>();
-#endif
                 if ((*it)["type"] == "LAST") {
                     throw_wrong_type_error(*it, (*it)["type"], "MIDDLE");
                 }
                 modules[i].type = MT_MIDDLE;
             } else {
-#if 0
-                modules[i].next = NULL;
-#else
                 modules[i].next = -1;
-#endif
                 if ((*it)["type"] != "LAST") {
                     throw_wrong_type_error(*it, (*it)["type"], "LAST");
                 }
@@ -87,19 +109,24 @@ int create_config(const char *fileName, module_t **target) {
                 first = i;
                 modules[i].type = MT_FIRST;
             }
-        } catch (std::logic_error e) {
-            std::cout << "Invalid json file " << fileName << std::endl;
-            std::cout << "Every module should contain id, name, \
-                          parameters, type, next_id and json_path" << std::endl; // TODO json_path?
-            std::cout << "Error was \"" << e.what() << "\"" << std::endl;
+        } catch (std::logic_error &e) {
+            LOG(ERROR) << "Invalid json file " << fileName << std::endl;
+            LOG(ERROR) << "Every module should contain id, name, \
+                          parameters, type, next_id" << std::endl;
+            LOG(ERROR) << "Error was \"" << e.what() << "\"" << std::endl;
             return -1;
         }
     }
     if (first == -1) {
-        std::cout << "No FIRST type" << std::endl;
+        LOG(ERROR) << "No FIRST type" << std::endl;
         return -1;
     }
-    // here should be check for loop (dfs)?
+#ifdef CONFIG_CHECK
+    bool dfs_was[jsonObj.size()] = {}; // default 0
+    if (dfs_check(&modules, dfs_was, jsonObj.size(), first) != 0) {
+        return -1;
+    }
+#endif
     *target = &(modules[0]);
     return jsonObj.size();
 }
