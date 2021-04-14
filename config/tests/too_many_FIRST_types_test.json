@@ -3,8 +3,8 @@
         "id": 0,
         "name": null,
         "parameters": [],
-        "type": "MIDDLE",
-        "next_id": 1
+        "type": "FIRST",
+        "next_id": null
     },
     "capturer": {
         "id": 1,
@@ -17,7 +17,7 @@
         "id": 2,
         "name": "mfilter",
         "parameters": [],
-        "type": "MIDDLE",
+        "type": "FIRST",
         "next_id": 0
     }
 }

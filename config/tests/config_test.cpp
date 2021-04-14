@@ -1,60 +1,66 @@
 #include "config/config.h"
 
 #include <gtest/gtest.h>
+#include <glog/logging.h>
 
 namespace {
 
 class configTest : public ::testing::Test { };
 
+//const std::string test_folder = "../config/tests/"; // for running from "build"
+//const std::string test_folder = "../../config/tests/"; // for running from "build/bin"
+std::string test_folder;
+
 TEST_F(configTest, good_test_json) {
-    module_t *m;
-    int ans = model_read_configuration("../config/tests/good_test.json", &m);
+    module_t *m = NULL;
+    int ans = model_read_configuration((test_folder + "good_test.json").c_str(), &m);
     ASSERT_EQ(ans, 3);
-    for (int i = 0; i < ans; ++i)
-        module_description_free(&m[i]);
-    //delete[] m;
+    module_t_clean_up(&m, ans, -1);
 }
 
-TEST_F(configTest, ill_test_json) {
-    module_t *m;
-    int ans = model_read_configuration("../config/tests/ill_test.json", &m);
-    #ifdef CONFIG_CHECK
+TEST_F(configTest, bad_tests_json) {
+    module_t *m = NULL;
+    int ans = model_read_configuration((test_folder + "bad_test.json").c_str(), &m);
+    EXPECT_EQ(ans, -1);
+    module_t_clean_up(&m, ans, -1);
+    
+    ans = model_read_configuration((test_folder + "not_test.json").c_str(), &m);
+    EXPECT_EQ(ans, -1);
+    module_t_clean_up(&m, ans, -1);
+    
+    ans = model_read_configuration((test_folder + "empty_test.json").c_str(), &m);
+    EXPECT_EQ(ans, -1);
+    module_t_clean_up(&m, ans, -1);
+}
+
+TEST_F(configTest, extra_check_test_json) {
+    module_t *m = NULL;
+    int ans = model_read_configuration((test_folder + "too_many_FIRST_types_test.json").c_str(), &m);
+    EXPECT_EQ(ans, -1);
+    module_t_clean_up(&m, ans, -1);
+    
+    ans = model_read_configuration((test_folder + "too_many_null_name_test.json").c_str(), &m);
+    EXPECT_EQ(ans, -1);
+    module_t_clean_up(&m, ans, -1);
+    
+    ans = model_read_configuration((test_folder + "ill_test.json").c_str(), &m);
+    #ifdef CONFIG_EXTRA_CHECK
     EXPECT_EQ(ans, -1);
     #else
     EXPECT_EQ(ans, 3);
     #endif
-    for (int i = 0; i < ans; ++i)
-        module_description_free(&m[i]);
-    //delete[] m;
+    module_t_clean_up(&m, ans, -1);
 }
-
-TEST_F(configTest, bad_test_json) {
-    module_t *m;
-    int ans = model_read_configuration("../config/tests/bad_test.json", &m);
-    EXPECT_EQ(ans, -1);
-    for (int i = 0; i < ans; ++i)
-        module_description_free(&m[i]);
-}
-
-TEST_F(configTest, non_existing_test_json) {
-    module_t *m;
-    int ans = model_read_configuration("../config/tests/not_test.json", &m);
-    EXPECT_EQ(ans, -1);
-    for (int i = 0; i < ans; ++i)
-        module_description_free(&m[i]);
-}
-
-TEST_F(configTest, empty_test_json) {
-    module_t *m;
-    int ans = model_read_configuration("../config/tests/empty_test.json", &m);
-    EXPECT_EQ(ans, -1);
-    for (int i = 0; i < ans; ++i)
-        module_description_free(&m[i]);
-}
-
 }; // namespace
 
 int main(int argc, char* argv[]) {
-    ::testing::InitGoogleTest(&argc, argv);
+    if (argc != 2) {
+        std::cout << "Usage: " << argv[0] << " ../config/tests/" << std::endl;
+        return -1;
+    }
+    test_folder = argv[1];
+    ::testing::InitGoogleTest/*(NULL, static_cast<char **>(NULL));*/(&argc, argv);
+    //google::InitGoogleLogging/*(NULL);*/(argv[1]);
+    //google::InstallFailureSignalHandler();
     return RUN_ALL_TESTS();
 }

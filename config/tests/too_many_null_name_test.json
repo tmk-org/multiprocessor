@@ -3,19 +3,19 @@
         "id": 0,
         "name": null,
         "parameters": [],
-        "type": "MIDDLE",
-        "next_id": 1
+        "type": "LAST",
+        "next_id": null
     },
     "capturer": {
         "id": 1,
-        "name": "mcapturer",
+        "name": null,
         "parameters": [],
         "type": "FIRST",
         "next_id": 2
     },
     "filter": {
         "id": 2,
-        "name": "mfilter",
+        "name": null,
         "parameters": [],
         "type": "MIDDLE",
         "next_id": 0
