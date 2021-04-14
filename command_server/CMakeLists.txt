@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.17)
 
-set(PROJECT_NAME "tcp")
+set(PROJECT_NAME "cmdsrv")
 
 project(${PROJECT_NAME}
-    DESCRIPTION "Network communication library"
-    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/tcp"
+    DESCRIPTION "Network communication text-based command api"
+    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/api"
     LANGUAGES C CXX)
 
 ###############################################################################
@@ -26,25 +26,36 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 ###############################################################################
 
 #include(GenerateVersion)
+include_directories(${CMAKE_SOURCE_DIR}/../tcp/include)
+include_directories(${CMAKE_SOURCE_DIR}/../misc/include)
+include_directories(${CMAKE_SOURCE_DIR}/../model/include)
 
 add_library(${PROJECT_NAME} SHARED
     #headers
-    include/tcp/tcp_process.h
+    include/command_server/command_server.h
     #sources
-    src/tcp_process.c
+    src/command_server.c
+)
+target_link_libraries(${PROJECT_NAME} model misc)
+
+set(${PROJECT_NAME}_PUBLIC_HEADERS
+    include/command_server/command_server.h
 )
 
-target_link_libraries (${PROJECT_NAME} misc)
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+    PUBLIC_HEADER "{${PROJECT_NAME}_PUBLIC_HEADERS}"
+)
+
 target_include_directories (${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
-add_executable(tcp_server examples/server.c)
-target_link_libraries(tcp_server tcp)
+add_executable(cclient examples/client.c)
+target_link_libraries(cclient tcp)
 
-add_executable(tcp_client examples/client.c)
-target_link_libraries(tcp_client tcp)
+add_executable(cserver examples/server.c)
+target_link_libraries(cserver tcp ${PROJECT_NAME} -pthread)
 
 ###############################################################################
 # Tests
@@ -57,11 +68,11 @@ include_directories(${GTEST_INCLUDE_DIR})
 set(PROJECT_TESTS ${PROJECT_NAME}-tests)
 
 #add_executable(${PROJECT_TESTS}
-#    tests/TcpTests.cpp
+#    tests/ApiTests.cpp
 #)
 
 #add_executable(${PROJECT_TESTS}
-#    tests/tcp_tests.c
+#    tests/api_tests.c
 #)
 
 #target_link_libraries(${PROJECT_TESTS}
@@ -70,4 +81,4 @@ set(PROJECT_TESTS ${PROJECT_NAME}-tests)
 #)
 
 #add_test(${PROJECT_TESTS} ${PROJECT_TESTS})
-#add_test(NAME ${PROJECT_TESTS} COMMAND $<TARGET_FILE:${PROJECT_TESTS}>
+#add_test(NAME ${PROJECT_TESTS} COMMAND $<TARGET_FILE:${PROJECT_TESTS}>)
