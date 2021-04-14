@@ -68,3 +68,9 @@ target_include_directories (${PROJECT_NAME} PUBLIC
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIR})
+
+add_executable(api-alin_test tests/api-alin_test.cpp)
+target_link_libraries(api-alin_test gtest pthread gtest gtest_main)
+#target_link_libraries(api-alin_test api)
+link_directories(api-alin_test ./include)
+add_test(NAME api-alin-test COMMAND $<TARGET_FILE:api-alin_test>)

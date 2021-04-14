@@ -4,12 +4,9 @@
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 1 "<command-line>" 2
 # 1 "./api/api_parser.h"
-
-
-
-
+# 12 "./api/api_parser.h"
 extern "C" {
-# 16 "./api/api_parser.h"
+# 23 "./api/api_parser.h"
 # 1 "./api/api.inl" 1
 
 
@@ -27,25 +24,25 @@ void apiLive(const char *cmd, int *exit_flag);
 void apiControl(const char *cmd, int *exit_flag);
 void apiClean(const char *cmd, int *exit_flag);
 void apiStop(const char *cmd, int *exit_flag);
-# 17 "./api/api_parser.h" 2
-# 40 "./api/api_parser.h"
+# 24 "./api/api_parser.h" 2
+# 46 "./api/api_parser.h"
 # 1 "/usr/include/errno.h" 1 3 4
 # 25 "/usr/include/errno.h" 3 4
 # 1 "/usr/include/features.h" 1 3 4
-# 424 "/usr/include/features.h" 3 4
+# 461 "/usr/include/features.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 1 3 4
-# 427 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 3 4
+# 452 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
-# 428 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 453 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/long-double.h" 1 3 4
-# 429 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
-# 425 "/usr/include/features.h" 2 3 4
-# 448 "/usr/include/features.h" 3 4
+# 454 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 462 "/usr/include/features.h" 2 3 4
+# 485 "/usr/include/features.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 1 3 4
 # 10 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/gnu/stubs-64.h" 1 3 4
 # 11 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 2 3 4
-# 449 "/usr/include/features.h" 2 3 4
+# 486 "/usr/include/features.h" 2 3 4
 # 26 "/usr/include/errno.h" 2 3 4
 
 
@@ -85,17 +82,15 @@ extern int *__errno_location (void) throw () __attribute__ ((__const__));
 extern char *program_invocation_name;
 extern char *program_invocation_short_name;
 
-
-
-
-
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/error_t.h" 1 3 4
+# 22 "/usr/include/x86_64-linux-gnu/bits/types/error_t.h" 3 4
 typedef int error_t;
-
+# 49 "/usr/include/errno.h" 2 3 4
 
 
 
 }
-# 41 "./api/api_parser.h" 2
+# 47 "./api/api_parser.h" 2
 # 1 "/usr/include/stdio.h" 1 3 4
 # 27 "/usr/include/stdio.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -105,15 +100,23 @@ extern "C" {
 
 
 
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
-# 216 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
+# 209 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
 typedef long unsigned int size_t;
 # 34 "/usr/include/stdio.h" 2 3 4
+
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 1 3 4
+# 40 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 3 4
+typedef __builtin_va_list __gnuc_va_list;
+# 37 "/usr/include/stdio.h" 2 3 4
 
 # 1 "/usr/include/x86_64-linux-gnu/bits/types.h" 1 3 4
 # 27 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
 # 28 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/timesize.h" 1 3 4
+# 29 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
 
 
 typedef unsigned char __u_char;
@@ -137,6 +140,16 @@ typedef unsigned long int __uint64_t;
 
 
 
+typedef __int8_t __int_least8_t;
+typedef __uint8_t __uint_least8_t;
+typedef __int16_t __int_least16_t;
+typedef __uint16_t __uint_least16_t;
+typedef __int32_t __int_least32_t;
+typedef __uint32_t __uint_least32_t;
+typedef __int64_t __int_least64_t;
+typedef __uint64_t __uint_least64_t;
+
+
 
 typedef long int __quad_t;
 typedef unsigned long int __u_quad_t;
@@ -149,9 +162,11 @@ typedef unsigned long int __u_quad_t;
 
 typedef long int __intmax_t;
 typedef unsigned long int __uintmax_t;
-# 130 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
+# 141 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/typesizes.h" 1 3 4
-# 131 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+# 142 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/time64.h" 1 3 4
+# 143 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
 
 
 typedef unsigned long int __dev_t;
@@ -224,32 +239,11 @@ typedef unsigned int __socklen_t;
 
 
 typedef int __sig_atomic_t;
-# 36 "/usr/include/stdio.h" 2 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/types/__FILE.h" 1 3 4
+# 39 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h" 1 3 4
 
 
 
-struct _IO_FILE;
-typedef struct _IO_FILE __FILE;
-# 37 "/usr/include/stdio.h" 2 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/types/FILE.h" 1 3 4
-
-
-
-struct _IO_FILE;
-
-
-typedef struct _IO_FILE FILE;
-# 38 "/usr/include/stdio.h" 2 3 4
-
-
-
-# 1 "/usr/include/x86_64-linux-gnu/bits/libio.h" 1 3 4
-# 35 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/_G_config.h" 1 3 4
-# 19 "/usr/include/x86_64-linux-gnu/bits/_G_config.h" 3 4
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
-# 20 "/usr/include/x86_64-linux-gnu/bits/_G_config.h" 2 3 4
 
 # 1 "/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h" 1 3 4
 # 13 "/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h" 3 4
@@ -262,29 +256,47 @@ typedef struct
     char __wchb[4];
   } __value;
 } __mbstate_t;
-# 22 "/usr/include/x86_64-linux-gnu/bits/_G_config.h" 2 3 4
+# 6 "/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h" 2 3 4
 
 
 
 
-typedef struct
+typedef struct _G_fpos_t
 {
   __off_t __pos;
   __mbstate_t __state;
-} _G_fpos_t;
-typedef struct
+} __fpos_t;
+# 40 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h" 1 3 4
+# 10 "/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h" 3 4
+typedef struct _G_fpos64_t
 {
   __off64_t __pos;
   __mbstate_t __state;
-} _G_fpos64_t;
-# 36 "/usr/include/x86_64-linux-gnu/bits/libio.h" 2 3 4
-# 53 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stdarg.h" 1 3 4
-# 40 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stdarg.h" 3 4
-typedef __builtin_va_list __gnuc_va_list;
-# 54 "/usr/include/x86_64-linux-gnu/bits/libio.h" 2 3 4
-# 149 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-struct _IO_jump_t; struct _IO_FILE;
+} __fpos64_t;
+# 41 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__FILE.h" 1 3 4
+
+
+
+struct _IO_FILE;
+typedef struct _IO_FILE __FILE;
+# 42 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/FILE.h" 1 3 4
+
+
+
+struct _IO_FILE;
+
+
+typedef struct _IO_FILE FILE;
+# 43 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h" 1 3 4
+# 35 "/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h" 3 4
+struct _IO_FILE;
+struct _IO_marker;
+struct _IO_codecvt;
+struct _IO_wide_data;
 
 
 
@@ -295,39 +307,20 @@ typedef void _IO_lock_t;
 
 
 
-struct _IO_marker {
-  struct _IO_marker *_next;
-  struct _IO_FILE *_sbuf;
-
-
-
-  int _pos;
-# 177 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-};
-
-
-enum __codecvt_result
+struct _IO_FILE
 {
-  __codecvt_ok,
-  __codecvt_partial,
-  __codecvt_error,
-  __codecvt_noconv
-};
-# 245 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-struct _IO_FILE {
   int _flags;
 
 
+  char *_IO_read_ptr;
+  char *_IO_read_end;
+  char *_IO_read_base;
+  char *_IO_write_base;
+  char *_IO_write_ptr;
+  char *_IO_write_end;
+  char *_IO_buf_base;
+  char *_IO_buf_end;
 
-
-  char* _IO_read_ptr;
-  char* _IO_read_end;
-  char* _IO_read_base;
-  char* _IO_write_base;
-  char* _IO_write_ptr;
-  char* _IO_write_end;
-  char* _IO_buf_base;
-  char* _IO_buf_end;
 
   char *_IO_save_base;
   char *_IO_backup_base;
@@ -338,63 +331,40 @@ struct _IO_FILE {
   struct _IO_FILE *_chain;
 
   int _fileno;
-
-
-
   int _flags2;
-
   __off_t _old_offset;
-
 
 
   unsigned short _cur_column;
   signed char _vtable_offset;
   char _shortbuf[1];
 
-
-
   _IO_lock_t *_lock;
-# 293 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
+
+
+
+
+
+
+
   __off64_t _offset;
 
-
-
-
-
-
-
-  void *__pad1;
-  void *__pad2;
-  void *__pad3;
-  void *__pad4;
-
+  struct _IO_codecvt *_codecvt;
+  struct _IO_wide_data *_wide_data;
+  struct _IO_FILE *_freeres_list;
+  void *_freeres_buf;
   size_t __pad5;
   int _mode;
 
   char _unused2[15 * sizeof (int) - 4 * sizeof (void *) - sizeof (size_t)];
-
 };
+# 44 "/usr/include/stdio.h" 2 3 4
 
 
-
-
-
-struct _IO_FILE_plus;
-
-extern struct _IO_FILE_plus _IO_2_1_stdin_;
-extern struct _IO_FILE_plus _IO_2_1_stdout_;
-extern struct _IO_FILE_plus _IO_2_1_stderr_;
-# 337 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-typedef __ssize_t __io_read_fn (void *__cookie, char *__buf, size_t __nbytes);
-
-
-
-
-
-
-
-typedef __ssize_t __io_write_fn (void *__cookie, const char *__buf,
-     size_t __n);
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h" 1 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h" 3 4
+typedef __ssize_t cookie_read_function_t (void *__cookie, char *__buf,
+                                          size_t __nbytes);
 
 
 
@@ -402,80 +372,40 @@ typedef __ssize_t __io_write_fn (void *__cookie, const char *__buf,
 
 
 
-typedef int __io_seek_fn (void *__cookie, __off64_t *__pos, int __w);
-
-
-typedef int __io_close_fn (void *__cookie);
-
+typedef __ssize_t cookie_write_function_t (void *__cookie, const char *__buf,
+                                           size_t __nbytes);
 
 
 
-typedef __io_read_fn cookie_read_function_t;
-typedef __io_write_fn cookie_write_function_t;
-typedef __io_seek_fn cookie_seek_function_t;
-typedef __io_close_fn cookie_close_function_t;
 
 
-typedef struct
+
+
+typedef int cookie_seek_function_t (void *__cookie, __off64_t *__pos, int __w);
+
+
+typedef int cookie_close_function_t (void *__cookie);
+
+
+
+
+
+
+typedef struct _IO_cookie_io_functions_t
 {
-  __io_read_fn *read;
-  __io_write_fn *write;
-  __io_seek_fn *seek;
-  __io_close_fn *close;
-} _IO_cookie_io_functions_t;
-typedef _IO_cookie_io_functions_t cookie_io_functions_t;
+  cookie_read_function_t *read;
+  cookie_write_function_t *write;
+  cookie_seek_function_t *seek;
+  cookie_close_function_t *close;
+} cookie_io_functions_t;
+# 47 "/usr/include/stdio.h" 2 3 4
 
-struct _IO_cookie_file;
-
-
-extern void _IO_cookie_init (struct _IO_cookie_file *__cfile, int __read_write,
-        void *__cookie, _IO_cookie_io_functions_t __fns);
-
-
-
-
-extern "C" {
-
-
-extern int __underflow (_IO_FILE *);
-extern int __uflow (_IO_FILE *);
-extern int __overflow (_IO_FILE *, int);
-# 433 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-extern int _IO_getc (_IO_FILE *__fp);
-extern int _IO_putc (int __c, _IO_FILE *__fp);
-extern int _IO_feof (_IO_FILE *__fp) throw ();
-extern int _IO_ferror (_IO_FILE *__fp) throw ();
-
-extern int _IO_peekc_locked (_IO_FILE *__fp);
-
-
-
-
-
-extern void _IO_flockfile (_IO_FILE *) throw ();
-extern void _IO_funlockfile (_IO_FILE *) throw ();
-extern int _IO_ftrylockfile (_IO_FILE *) throw ();
-# 462 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-extern int _IO_vfscanf (_IO_FILE * __restrict, const char * __restrict,
-   __gnuc_va_list, int *__restrict);
-extern int _IO_vfprintf (_IO_FILE *__restrict, const char *__restrict,
-    __gnuc_va_list);
-extern __ssize_t _IO_padn (_IO_FILE *, int, __ssize_t);
-extern size_t _IO_sgetn (_IO_FILE *, void *, size_t);
-
-extern __off64_t _IO_seekoff (_IO_FILE *, __off64_t, int, int);
-extern __off64_t _IO_seekpos (_IO_FILE *, __off64_t, int);
-
-extern void _IO_free_backup_area (_IO_FILE *) throw ();
-# 524 "/usr/include/x86_64-linux-gnu/bits/libio.h" 3 4
-}
-# 42 "/usr/include/stdio.h" 2 3 4
 
 
 
 
 typedef __gnuc_va_list va_list;
-# 57 "/usr/include/stdio.h" 3 4
+# 63 "/usr/include/stdio.h" 3 4
 typedef __off_t off_t;
 
 
@@ -497,21 +427,21 @@ typedef __ssize_t ssize_t;
 
 
 
-typedef _G_fpos_t fpos_t;
+typedef __fpos_t fpos_t;
 
 
 
 
-typedef _G_fpos64_t fpos64_t;
-# 131 "/usr/include/stdio.h" 3 4
+typedef __fpos64_t fpos64_t;
+# 133 "/usr/include/stdio.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/stdio_lim.h" 1 3 4
-# 132 "/usr/include/stdio.h" 2 3 4
+# 134 "/usr/include/stdio.h" 2 3 4
 
 
 
-extern struct _IO_FILE *stdin;
-extern struct _IO_FILE *stdout;
-extern struct _IO_FILE *stderr;
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
 
 
 
@@ -526,6 +456,9 @@ extern int rename (const char *__old, const char *__new) throw ();
 
 extern int renameat (int __oldfd, const char *__old, int __newfd,
        const char *__new) throw ();
+# 164 "/usr/include/stdio.h" 3 4
+extern int renameat2 (int __oldfd, const char *__old, int __newfd,
+        const char *__new, unsigned int __flags) throw ();
 
 
 
@@ -534,7 +467,7 @@ extern int renameat (int __oldfd, const char *__old, int __newfd,
 
 
 extern FILE *tmpfile (void) ;
-# 169 "/usr/include/stdio.h" 3 4
+# 183 "/usr/include/stdio.h" 3 4
 extern FILE *tmpfile64 (void) ;
 
 
@@ -545,7 +478,7 @@ extern char *tmpnam (char *__s) throw () ;
 
 
 extern char *tmpnam_r (char *__s) throw () ;
-# 190 "/usr/include/stdio.h" 3 4
+# 204 "/usr/include/stdio.h" 3 4
 extern char *tempnam (const char *__dir, const char *__pfx)
      throw () __attribute__ ((__malloc__)) ;
 
@@ -561,11 +494,11 @@ extern int fclose (FILE *__stream);
 
 
 extern int fflush (FILE *__stream);
-# 213 "/usr/include/stdio.h" 3 4
+# 227 "/usr/include/stdio.h" 3 4
 extern int fflush_unlocked (FILE *__stream);
-# 223 "/usr/include/stdio.h" 3 4
+# 237 "/usr/include/stdio.h" 3 4
 extern int fcloseall (void);
-# 232 "/usr/include/stdio.h" 3 4
+# 246 "/usr/include/stdio.h" 3 4
 extern FILE *fopen (const char *__restrict __filename,
       const char *__restrict __modes) ;
 
@@ -575,7 +508,7 @@ extern FILE *fopen (const char *__restrict __filename,
 extern FILE *freopen (const char *__restrict __filename,
         const char *__restrict __modes,
         FILE *__restrict __stream) ;
-# 256 "/usr/include/stdio.h" 3 4
+# 270 "/usr/include/stdio.h" 3 4
 extern FILE *fopen64 (const char *__restrict __filename,
         const char *__restrict __modes) ;
 extern FILE *freopen64 (const char *__restrict __filename,
@@ -593,7 +526,7 @@ extern FILE *fdopen (int __fd, const char *__modes) throw () ;
 
 extern FILE *fopencookie (void *__restrict __magic_cookie,
      const char *__restrict __modes,
-     _IO_cookie_io_functions_t __io_funcs) throw () ;
+     cookie_io_functions_t __io_funcs) throw () ;
 
 
 
@@ -707,7 +640,21 @@ extern int scanf (const char *__restrict __format, ...) ;
 
 extern int sscanf (const char *__restrict __s,
      const char *__restrict __format, ...) throw ();
-# 420 "/usr/include/stdio.h" 3 4
+
+
+
+
+
+
+extern int fscanf (FILE *__restrict __stream, const char *__restrict __format, ...) __asm__ ("" "__isoc99_fscanf")
+
+                               ;
+extern int scanf (const char *__restrict __format, ...) __asm__ ("" "__isoc99_scanf")
+                              ;
+extern int sscanf (const char *__restrict __s, const char *__restrict __format, ...) throw () __asm__ ("" "__isoc99_sscanf")
+
+                      ;
+# 432 "/usr/include/stdio.h" 3 4
 extern int vfscanf (FILE *__restrict __s, const char *__restrict __format,
       __gnuc_va_list __arg)
      __attribute__ ((__format__ (__scanf__, 2, 0))) ;
@@ -723,7 +670,24 @@ extern int vscanf (const char *__restrict __format, __gnuc_va_list __arg)
 extern int vsscanf (const char *__restrict __s,
       const char *__restrict __format, __gnuc_va_list __arg)
      throw () __attribute__ ((__format__ (__scanf__, 2, 0)));
-# 477 "/usr/include/stdio.h" 3 4
+
+
+
+
+extern int vfscanf (FILE *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg) __asm__ ("" "__isoc99_vfscanf")
+
+
+
+     __attribute__ ((__format__ (__scanf__, 2, 0))) ;
+extern int vscanf (const char *__restrict __format, __gnuc_va_list __arg) __asm__ ("" "__isoc99_vscanf")
+
+     __attribute__ ((__format__ (__scanf__, 1, 0))) ;
+extern int vsscanf (const char *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg) throw () __asm__ ("" "__isoc99_vsscanf")
+
+
+
+     __attribute__ ((__format__ (__scanf__, 2, 0)));
+# 485 "/usr/include/stdio.h" 3 4
 extern int fgetc (FILE *__stream);
 extern int getc (FILE *__stream);
 
@@ -732,12 +696,17 @@ extern int getc (FILE *__stream);
 
 
 extern int getchar (void);
-# 495 "/usr/include/stdio.h" 3 4
+
+
+
+
+
+
 extern int getc_unlocked (FILE *__stream);
 extern int getchar_unlocked (void);
-# 506 "/usr/include/stdio.h" 3 4
+# 510 "/usr/include/stdio.h" 3 4
 extern int fgetc_unlocked (FILE *__stream);
-# 517 "/usr/include/stdio.h" 3 4
+# 521 "/usr/include/stdio.h" 3 4
 extern int fputc (int __c, FILE *__stream);
 extern int putc (int __c, FILE *__stream);
 
@@ -781,11 +750,11 @@ extern char *fgets_unlocked (char *__restrict __s, int __n,
         FILE *__restrict __stream) ;
 # 603 "/usr/include/stdio.h" 3 4
 extern __ssize_t __getdelim (char **__restrict __lineptr,
-          size_t *__restrict __n, int __delimiter,
-          FILE *__restrict __stream) ;
+                             size_t *__restrict __n, int __delimiter,
+                             FILE *__restrict __stream) ;
 extern __ssize_t getdelim (char **__restrict __lineptr,
-        size_t *__restrict __n, int __delimiter,
-        FILE *__restrict __stream) ;
+                           size_t *__restrict __n, int __delimiter,
+                           FILE *__restrict __stream) ;
 
 
 
@@ -794,8 +763,8 @@ extern __ssize_t getdelim (char **__restrict __lineptr,
 
 
 extern __ssize_t getline (char **__restrict __lineptr,
-       size_t *__restrict __n,
-       FILE *__restrict __stream) ;
+                          size_t *__restrict __n,
+                          FILE *__restrict __stream) ;
 
 
 
@@ -971,18 +940,21 @@ extern int ftrylockfile (FILE *__stream) throw () ;
 
 
 extern void funlockfile (FILE *__stream) throw ();
-# 868 "/usr/include/stdio.h" 3 4
+# 858 "/usr/include/stdio.h" 3 4
+extern int __uflow (FILE *);
+extern int __overflow (FILE *, int);
+# 873 "/usr/include/stdio.h" 3 4
 }
-# 42 "./api/api_parser.h" 2
-# 1 "/usr/include/c++/7/stdlib.h" 1 3
-# 36 "/usr/include/c++/7/stdlib.h" 3
-# 1 "/usr/include/c++/7/cstdlib" 1 3
-# 39 "/usr/include/c++/7/cstdlib" 3
+# 48 "./api/api_parser.h" 2
+# 1 "/usr/include/c++/9/stdlib.h" 1 3
+# 36 "/usr/include/c++/9/stdlib.h" 3
+# 1 "/usr/include/c++/9/cstdlib" 1 3
+# 39 "/usr/include/c++/9/cstdlib" 3
        
-# 40 "/usr/include/c++/7/cstdlib" 3
+# 40 "/usr/include/c++/9/cstdlib" 3
 
-# 1 "/usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h" 1 3
-# 229 "/usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h" 3
+# 1 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 1 3
+# 252 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 3
 namespace std
 {
   typedef long unsigned int size_t;
@@ -992,7 +964,7 @@ namespace std
   typedef decltype(nullptr) nullptr_t;
 
 }
-# 251 "/usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h" 3
+# 274 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 3
 namespace std
 {
   inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
@@ -1001,15 +973,18 @@ namespace __gnu_cxx
 {
   inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
 }
-# 533 "/usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h" 3
-# 1 "/usr/include/x86_64-linux-gnu/c++/7/bits/os_defines.h" 1 3
-# 534 "/usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h" 2 3
+# 524 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 3
+# 1 "/usr/include/x86_64-linux-gnu/c++/9/bits/os_defines.h" 1 3
+# 525 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 2 3
 
 
-# 1 "/usr/include/x86_64-linux-gnu/c++/7/bits/cpu_defines.h" 1 3
-# 537 "/usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h" 2 3
-# 42 "/usr/include/c++/7/cstdlib" 2 3
-# 75 "/usr/include/c++/7/cstdlib" 3
+# 1 "/usr/include/x86_64-linux-gnu/c++/9/bits/cpu_defines.h" 1 3
+# 528 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 2 3
+# 690 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 3
+# 1 "/usr/include/c++/9/pstl/pstl_config.h" 1 3
+# 691 "/usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h" 2 3
+# 42 "/usr/include/c++/9/cstdlib" 2 3
+# 75 "/usr/include/c++/9/cstdlib" 3
 # 1 "/usr/include/stdlib.h" 1 3 4
 # 25 "/usr/include/stdlib.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -1019,7 +994,7 @@ namespace __gnu_cxx
 
 
 
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
 # 32 "/usr/include/stdlib.h" 2 3 4
 
 extern "C" {
@@ -1050,13 +1025,13 @@ typedef __float128 _Float128;
 # 24 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/long-double.h" 1 3 4
 # 25 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 2 3 4
-# 207 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
+# 214 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
 typedef float _Float32;
-# 244 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
+# 251 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
 typedef double _Float64;
-# 261 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
+# 268 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
 typedef double _Float32x;
-# 278 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
+# 285 "/usr/include/x86_64-linux-gnu/bits/floatn-common.h" 3 4
 typedef long double _Float64x;
 # 121 "/usr/include/x86_64-linux-gnu/bits/floatn.h" 2 3 4
 # 56 "/usr/include/stdlib.h" 2 3 4
@@ -1340,9 +1315,8 @@ typedef __u_quad_t u_quad_t;
 typedef __fsid_t fsid_t;
 
 
-
-
 typedef __loff_t loff_t;
+
 
 
 
@@ -1379,7 +1353,7 @@ typedef __nlink_t nlink_t;
 
 
 typedef __uid_t uid_t;
-# 98 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
+# 97 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
 typedef __pid_t pid_t;
 
 
@@ -1387,7 +1361,7 @@ typedef __pid_t pid_t;
 
 
 typedef __id_t id_t;
-# 115 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
+# 114 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
 typedef __daddr_t daddr_t;
 typedef __caddr_t caddr_t;
 
@@ -1408,7 +1382,7 @@ typedef __key_t key_t;
 
 
 typedef __clock_t clock_t;
-# 128 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 127 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 
 # 1 "/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h" 1 3 4
 
@@ -1418,7 +1392,7 @@ typedef __clock_t clock_t;
 
 
 typedef __clockid_t clockid_t;
-# 130 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 129 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/types/time_t.h" 1 3 4
 
 
@@ -1427,7 +1401,7 @@ typedef __clockid_t clockid_t;
 
 
 typedef __time_t time_t;
-# 131 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 130 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/types/timer_t.h" 1 3 4
 
 
@@ -1436,7 +1410,7 @@ typedef __time_t time_t;
 
 
 typedef __timer_t timer_t;
-# 132 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 131 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 
 
 
@@ -1450,8 +1424,8 @@ typedef __suseconds_t suseconds_t;
 
 
 
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
-# 146 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
+# 145 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 
 
 
@@ -1468,45 +1442,62 @@ typedef __int8_t int8_t;
 typedef __int16_t int16_t;
 typedef __int32_t int32_t;
 typedef __int64_t int64_t;
-# 157 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
-# 178 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
-typedef unsigned int u_int8_t __attribute__ ((__mode__ (__QI__)));
-typedef unsigned int u_int16_t __attribute__ ((__mode__ (__HI__)));
-typedef unsigned int u_int32_t __attribute__ ((__mode__ (__SI__)));
-typedef unsigned int u_int64_t __attribute__ ((__mode__ (__DI__)));
+# 156 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+
+
+typedef __uint8_t u_int8_t;
+typedef __uint16_t u_int16_t;
+typedef __uint32_t u_int32_t;
+typedef __uint64_t u_int64_t;
+
 
 typedef int register_t __attribute__ ((__mode__ (__word__)));
-# 194 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
+# 176 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
 # 1 "/usr/include/endian.h" 1 3 4
-# 36 "/usr/include/endian.h" 3 4
+# 24 "/usr/include/endian.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/endian.h" 1 3 4
-# 37 "/usr/include/endian.h" 2 3 4
-# 60 "/usr/include/endian.h" 3 4
+# 35 "/usr/include/x86_64-linux-gnu/bits/endian.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/endianness.h" 1 3 4
+# 36 "/usr/include/x86_64-linux-gnu/bits/endian.h" 2 3 4
+# 25 "/usr/include/endian.h" 2 3 4
+# 35 "/usr/include/endian.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 1 3 4
-# 28 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
-# 29 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 2 3 4
-
-
-
-
-
-
-# 1 "/usr/include/x86_64-linux-gnu/bits/byteswap-16.h" 1 3 4
-# 36 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 2 3 4
-# 44 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 3 4
-static __inline unsigned int
-__bswap_32 (unsigned int __bsx)
+# 33 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 3 4
+static __inline __uint16_t
+__bswap_16 (__uint16_t __bsx)
 {
-  return __builtin_bswap32 (__bsx);
+
+  return __builtin_bswap16 (__bsx);
+
+
+
 }
-# 108 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 3 4
-static __inline __uint64_t
+
+
+
+
+
+
+static __inline __uint32_t
+__bswap_32 (__uint32_t __bsx)
+{
+
+  return __builtin_bswap32 (__bsx);
+
+
+
+}
+# 69 "/usr/include/x86_64-linux-gnu/bits/byteswap.h" 3 4
+__extension__ static __inline __uint64_t
 __bswap_64 (__uint64_t __bsx)
 {
+
   return __builtin_bswap64 (__bsx);
+
+
+
 }
-# 61 "/usr/include/endian.h" 2 3 4
+# 36 "/usr/include/endian.h" 2 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/uintn-identity.h" 1 3 4
 # 32 "/usr/include/x86_64-linux-gnu/bits/uintn-identity.h" 3 4
 static __inline __uint16_t
@@ -1526,8 +1517,8 @@ __uint64_identity (__uint64_t __x)
 {
   return __x;
 }
-# 62 "/usr/include/endian.h" 2 3 4
-# 195 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 37 "/usr/include/endian.h" 2 3 4
+# 177 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 
 
 # 1 "/usr/include/x86_64-linux-gnu/sys/select.h" 1 3 4
@@ -1576,11 +1567,15 @@ struct timeval
 # 38 "/usr/include/x86_64-linux-gnu/sys/select.h" 2 3 4
 
 # 1 "/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h" 1 3 4
-# 9 "/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h" 3 4
+# 10 "/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h" 3 4
 struct timespec
 {
   __time_t tv_sec;
+
+
+
   __syscall_slong_t tv_nsec;
+# 26 "/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h" 3 4
 };
 # 40 "/usr/include/x86_64-linux-gnu/sys/select.h" 2 3 4
 # 49 "/usr/include/x86_64-linux-gnu/sys/select.h" 3 4
@@ -1620,28 +1615,7 @@ extern int pselect (int __nfds, fd_set *__restrict __readfds,
       const __sigset_t *__restrict __sigmask);
 # 126 "/usr/include/x86_64-linux-gnu/sys/select.h" 3 4
 }
-# 198 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
-
-
-
-
-
-
-
-# 1 "/usr/include/x86_64-linux-gnu/sys/sysmacros.h" 1 3 4
-# 41 "/usr/include/x86_64-linux-gnu/sys/sysmacros.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/sysmacros.h" 1 3 4
-# 42 "/usr/include/x86_64-linux-gnu/sys/sysmacros.h" 2 3 4
-# 71 "/usr/include/x86_64-linux-gnu/sys/sysmacros.h" 3 4
-extern "C" {
-
-extern unsigned int gnu_dev_major (__dev_t __dev) throw () __attribute__ ((__const__));
-extern unsigned int gnu_dev_minor (__dev_t __dev) throw () __attribute__ ((__const__));
-extern __dev_t gnu_dev_makedev (unsigned int __major, unsigned int __minor) throw () __attribute__ ((__const__));
-# 85 "/usr/include/x86_64-linux-gnu/sys/sysmacros.h" 3 4
-}
-# 206 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
-
+# 180 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 
 
 
@@ -1663,7 +1637,7 @@ typedef __fsblkcnt_t fsblkcnt_t;
 
 
 typedef __fsfilcnt_t fsfilcnt_t;
-# 246 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
+# 219 "/usr/include/x86_64-linux-gnu/sys/types.h" 3 4
 typedef __blkcnt64_t blkcnt64_t;
 typedef __fsblkcnt64_t fsblkcnt64_t;
 typedef __fsfilcnt64_t fsfilcnt64_t;
@@ -1675,12 +1649,50 @@ typedef __fsfilcnt64_t fsfilcnt64_t;
 # 1 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes.h" 1 3 4
 # 23 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 1 3 4
-# 77 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
+# 44 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h" 1 3 4
 # 21 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
 # 22 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h" 2 3 4
-# 65 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h" 3 4
+# 45 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 2 3 4
+
+
+
+
+typedef struct __pthread_internal_list
+{
+  struct __pthread_internal_list *__prev;
+  struct __pthread_internal_list *__next;
+} __pthread_list_t;
+
+typedef struct __pthread_internal_slist
+{
+  struct __pthread_internal_slist *__next;
+} __pthread_slist_t;
+# 74 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/struct_mutex.h" 1 3 4
+# 22 "/usr/include/x86_64-linux-gnu/bits/struct_mutex.h" 3 4
+struct __pthread_mutex_s
+{
+  int __lock;
+  unsigned int __count;
+  int __owner;
+
+  unsigned int __nusers;
+
+
+
+  int __kind;
+
+  short __spins;
+  short __elision;
+  __pthread_list_t __list;
+# 53 "/usr/include/x86_64-linux-gnu/bits/struct_mutex.h" 3 4
+};
+# 75 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 2 3 4
+# 87 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h" 1 3 4
+# 23 "/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h" 3 4
 struct __pthread_rwlock_arch_t
 {
   unsigned int __readers;
@@ -1704,38 +1716,9 @@ struct __pthread_rwlock_arch_t
 
 
   unsigned int __flags;
-# 99 "/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h" 3 4
+# 55 "/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h" 3 4
 };
-# 78 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 2 3 4
-
-
-
-
-typedef struct __pthread_internal_list
-{
-  struct __pthread_internal_list *__prev;
-  struct __pthread_internal_list *__next;
-} __pthread_list_t;
-# 118 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
-struct __pthread_mutex_s
-{
-  int __lock ;
-  unsigned int __count;
-  int __owner;
-
-  unsigned int __nusers;
-# 148 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
-  int __kind;
- 
-
-
-
-
-  short __spins; short __elision;
-  __pthread_list_t __list;
-# 165 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 3 4
- 
-};
+# 88 "/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h" 2 3 4
 
 
 
@@ -1862,7 +1845,7 @@ typedef union
   char __size[4];
   int __align;
 } pthread_barrierattr_t;
-# 255 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
+# 228 "/usr/include/x86_64-linux-gnu/sys/types.h" 2 3 4
 
 
 }
@@ -2011,10 +1994,11 @@ extern int lcong48_r (unsigned short int __param[7],
 
 
 
-extern void *malloc (size_t __size) throw () __attribute__ ((__malloc__)) ;
+extern void *malloc (size_t __size) throw () __attribute__ ((__malloc__))
+     __attribute__ ((__alloc_size__ (1))) ;
 
 extern void *calloc (size_t __nmemb, size_t __size)
-     throw () __attribute__ ((__malloc__)) ;
+     throw () __attribute__ ((__malloc__)) __attribute__ ((__alloc_size__ (1, 2))) ;
 
 
 
@@ -2022,7 +2006,7 @@ extern void *calloc (size_t __nmemb, size_t __size)
 
 
 extern void *realloc (void *__ptr, size_t __size)
-     throw () __attribute__ ((__warn_unused_result__));
+     throw () __attribute__ ((__warn_unused_result__)) __attribute__ ((__alloc_size__ (2)));
 
 
 
@@ -2031,7 +2015,8 @@ extern void *realloc (void *__ptr, size_t __size)
 
 
 extern void *reallocarray (void *__ptr, size_t __nmemb, size_t __size)
-     throw () __attribute__ ((__warn_unused_result__));
+     throw () __attribute__ ((__warn_unused_result__))
+     __attribute__ ((__alloc_size__ (2, 3)));
 
 
 
@@ -2040,7 +2025,7 @@ extern void free (void *__ptr) throw ();
 
 # 1 "/usr/include/alloca.h" 1 3 4
 # 24 "/usr/include/alloca.h" 3 4
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
 # 25 "/usr/include/alloca.h" 2 3 4
 
 extern "C" {
@@ -2056,13 +2041,14 @@ extern void *alloca (size_t __size) throw ();
 
 
 }
-# 567 "/usr/include/stdlib.h" 2 3 4
+# 569 "/usr/include/stdlib.h" 2 3 4
 
 
 
 
 
-extern void *valloc (size_t __size) throw () __attribute__ ((__malloc__)) ;
+extern void *valloc (size_t __size) throw () __attribute__ ((__malloc__))
+     __attribute__ ((__alloc_size__ (1))) ;
 
 
 
@@ -2089,7 +2075,7 @@ extern int atexit (void (*__func) (void)) throw () __attribute__ ((__nonnull__ (
 
 extern "C++" int at_quick_exit (void (*__func) (void))
      throw () __asm ("at_quick_exit") __attribute__ ((__nonnull__ (1)));
-# 607 "/usr/include/stdlib.h" 3 4
+# 610 "/usr/include/stdlib.h" 3 4
 extern int on_exit (void (*__func) (int __status, void *__arg), void *__arg)
      throw () __attribute__ ((__nonnull__ (1)));
 
@@ -2145,30 +2131,30 @@ extern int unsetenv (const char *__name) throw () __attribute__ ((__nonnull__ (1
 
 
 extern int clearenv (void) throw ();
-# 672 "/usr/include/stdlib.h" 3 4
+# 675 "/usr/include/stdlib.h" 3 4
 extern char *mktemp (char *__template) throw () __attribute__ ((__nonnull__ (1)));
-# 685 "/usr/include/stdlib.h" 3 4
+# 688 "/usr/include/stdlib.h" 3 4
 extern int mkstemp (char *__template) __attribute__ ((__nonnull__ (1))) ;
-# 695 "/usr/include/stdlib.h" 3 4
+# 698 "/usr/include/stdlib.h" 3 4
 extern int mkstemp64 (char *__template) __attribute__ ((__nonnull__ (1))) ;
-# 707 "/usr/include/stdlib.h" 3 4
+# 710 "/usr/include/stdlib.h" 3 4
 extern int mkstemps (char *__template, int __suffixlen) __attribute__ ((__nonnull__ (1))) ;
-# 717 "/usr/include/stdlib.h" 3 4
+# 720 "/usr/include/stdlib.h" 3 4
 extern int mkstemps64 (char *__template, int __suffixlen)
      __attribute__ ((__nonnull__ (1))) ;
-# 728 "/usr/include/stdlib.h" 3 4
+# 731 "/usr/include/stdlib.h" 3 4
 extern char *mkdtemp (char *__template) throw () __attribute__ ((__nonnull__ (1))) ;
-# 739 "/usr/include/stdlib.h" 3 4
+# 742 "/usr/include/stdlib.h" 3 4
 extern int mkostemp (char *__template, int __flags) __attribute__ ((__nonnull__ (1))) ;
-# 749 "/usr/include/stdlib.h" 3 4
+# 752 "/usr/include/stdlib.h" 3 4
 extern int mkostemp64 (char *__template, int __flags) __attribute__ ((__nonnull__ (1))) ;
-# 759 "/usr/include/stdlib.h" 3 4
+# 762 "/usr/include/stdlib.h" 3 4
 extern int mkostemps (char *__template, int __suffixlen, int __flags)
      __attribute__ ((__nonnull__ (1))) ;
-# 771 "/usr/include/stdlib.h" 3 4
+# 774 "/usr/include/stdlib.h" 3 4
 extern int mkostemps64 (char *__template, int __suffixlen, int __flags)
      __attribute__ ((__nonnull__ (1))) ;
-# 781 "/usr/include/stdlib.h" 3 4
+# 784 "/usr/include/stdlib.h" 3 4
 extern int system (const char *__command) ;
 
 
@@ -2177,7 +2163,7 @@ extern int system (const char *__command) ;
 
 extern char *canonicalize_file_name (const char *__name)
      throw () __attribute__ ((__nonnull__ (1))) ;
-# 797 "/usr/include/stdlib.h" 3 4
+# 800 "/usr/include/stdlib.h" 3 4
 extern char *realpath (const char *__restrict __name,
          char *__restrict __resolved) throw () ;
 
@@ -2239,7 +2225,7 @@ extern ldiv_t ldiv (long int __numer, long int __denom)
 __extension__ extern lldiv_t lldiv (long long int __numer,
         long long int __denom)
      throw () __attribute__ ((__const__)) ;
-# 869 "/usr/include/stdlib.h" 3 4
+# 872 "/usr/include/stdlib.h" 3 4
 extern char *ecvt (double __value, int __ndigit, int *__restrict __decpt,
      int *__restrict __sign) throw () __attribute__ ((__nonnull__ (3, 4))) ;
 
@@ -2315,17 +2301,11 @@ extern size_t wcstombs (char *__restrict __s,
 
 
 extern int rpmatch (const char *__response) throw () __attribute__ ((__nonnull__ (1))) ;
-# 954 "/usr/include/stdlib.h" 3 4
+# 957 "/usr/include/stdlib.h" 3 4
 extern int getsubopt (char **__restrict __optionp,
         char *const *__restrict __tokens,
         char **__restrict __valuep)
      throw () __attribute__ ((__nonnull__ (1, 2, 3))) ;
-
-
-
-
-
-extern void setkey (const char *__key) throw () __attribute__ ((__nonnull__ (1)));
 
 
 
@@ -2370,18 +2350,18 @@ extern int getpt (void);
 
 extern int getloadavg (double __loadavg[], int __nelem)
      throw () __attribute__ ((__nonnull__ (1)));
-# 1016 "/usr/include/stdlib.h" 3 4
+# 1013 "/usr/include/stdlib.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/stdlib-float.h" 1 3 4
-# 1017 "/usr/include/stdlib.h" 2 3 4
-# 1026 "/usr/include/stdlib.h" 3 4
+# 1014 "/usr/include/stdlib.h" 2 3 4
+# 1023 "/usr/include/stdlib.h" 3 4
 }
-# 76 "/usr/include/c++/7/cstdlib" 2 3
+# 76 "/usr/include/c++/9/cstdlib" 2 3
 
-# 1 "/usr/include/c++/7/bits/std_abs.h" 1 3
-# 33 "/usr/include/c++/7/bits/std_abs.h" 3
+# 1 "/usr/include/c++/9/bits/std_abs.h" 1 3
+# 33 "/usr/include/c++/9/bits/std_abs.h" 3
        
-# 34 "/usr/include/c++/7/bits/std_abs.h" 3
-# 46 "/usr/include/c++/7/bits/std_abs.h" 3
+# 34 "/usr/include/c++/9/bits/std_abs.h" 3
+# 46 "/usr/include/c++/9/bits/std_abs.h" 3
 extern "C++"
 {
 namespace std __attribute__ ((__visibility__ ("default")))
@@ -2398,13 +2378,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
   inline long long
   abs(long long __x) { return __builtin_llabs (__x); }
-
-
-
-
-
-
-
+# 70 "/usr/include/c++/9/bits/std_abs.h" 3
   inline constexpr double
   abs(double __x)
   { return __builtin_fabs(__x); }
@@ -2416,12 +2390,12 @@ namespace std __attribute__ ((__visibility__ ("default")))
   inline constexpr long double
   abs(long double __x)
   { return __builtin_fabsl(__x); }
-# 106 "/usr/include/c++/7/bits/std_abs.h" 3
+# 107 "/usr/include/c++/9/bits/std_abs.h" 3
 
 }
 }
-# 78 "/usr/include/c++/7/cstdlib" 2 3
-# 121 "/usr/include/c++/7/cstdlib" 3
+# 78 "/usr/include/c++/9/cstdlib" 2 3
+# 121 "/usr/include/c++/9/cstdlib" 3
 extern "C++"
 {
 namespace std __attribute__ ((__visibility__ ("default")))
@@ -2484,7 +2458,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 
 }
-# 195 "/usr/include/c++/7/cstdlib" 3
+# 195 "/usr/include/c++/9/cstdlib" 3
 namespace __gnu_cxx __attribute__ ((__visibility__ ("default")))
 {
 
@@ -2507,7 +2481,7 @@ namespace __gnu_cxx __attribute__ ((__visibility__ ("default")))
   { lldiv_t __q; __q.quot = __n / __d; __q.rem = __n % __d; return __q; }
 
   using ::lldiv;
-# 227 "/usr/include/c++/7/cstdlib" 3
+# 227 "/usr/include/c++/9/cstdlib" 3
   using ::atoll;
   using ::strtoll;
   using ::strtoull;
@@ -2539,7 +2513,7 @@ namespace std
 
 
 }
-# 37 "/usr/include/c++/7/stdlib.h" 2 3
+# 37 "/usr/include/c++/9/stdlib.h" 2 3
 
 using std::abort;
 using std::atexit;
@@ -2585,13 +2559,13 @@ using std::system;
 
 using std::wcstombs;
 using std::wctomb;
-# 43 "./api/api_parser.h" 2
+# 49 "./api/api_parser.h" 2
 # 1 "/usr/include/unistd.h" 1 3 4
 # 27 "/usr/include/unistd.h" 3 4
 extern "C" {
-# 205 "/usr/include/unistd.h" 3 4
+# 202 "/usr/include/unistd.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/posix_opt.h" 1 3 4
-# 206 "/usr/include/unistd.h" 2 3 4
+# 203 "/usr/include/unistd.h" 2 3 4
 
 
 
@@ -2599,11 +2573,11 @@ extern "C" {
 # 22 "/usr/include/x86_64-linux-gnu/bits/environments.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
 # 23 "/usr/include/x86_64-linux-gnu/bits/environments.h" 2 3 4
-# 210 "/usr/include/unistd.h" 2 3 4
-# 229 "/usr/include/unistd.h" 3 4
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
-# 230 "/usr/include/unistd.h" 2 3 4
-# 270 "/usr/include/unistd.h" 3 4
+# 207 "/usr/include/unistd.h" 2 3 4
+# 226 "/usr/include/unistd.h" 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
+# 227 "/usr/include/unistd.h" 2 3 4
+# 267 "/usr/include/unistd.h" 3 4
 typedef __intptr_t intptr_t;
 
 
@@ -2612,7 +2586,7 @@ typedef __intptr_t intptr_t;
 
 
 typedef __socklen_t socklen_t;
-# 290 "/usr/include/unistd.h" 3 4
+# 287 "/usr/include/unistd.h" 3 4
 extern int access (const char *__name, int __type) throw () __attribute__ ((__nonnull__ (1)));
 
 
@@ -2632,9 +2606,9 @@ extern int eaccess (const char *__name, int __type)
 
 extern int faccessat (int __fd, const char *__file, int __type, int __flag)
      throw () __attribute__ ((__nonnull__ (2))) ;
-# 337 "/usr/include/unistd.h" 3 4
+# 334 "/usr/include/unistd.h" 3 4
 extern __off_t lseek (int __fd, __off_t __offset, int __whence) throw ();
-# 348 "/usr/include/unistd.h" 3 4
+# 345 "/usr/include/unistd.h" 3 4
 extern __off64_t lseek64 (int __fd, __off64_t __offset, int __whence)
      throw ();
 
@@ -2657,7 +2631,7 @@ extern ssize_t read (int __fd, void *__buf, size_t __nbytes) ;
 
 
 extern ssize_t write (int __fd, const void *__buf, size_t __n) ;
-# 379 "/usr/include/unistd.h" 3 4
+# 376 "/usr/include/unistd.h" 3 4
 extern ssize_t pread (int __fd, void *__buf, size_t __nbytes,
         __off_t __offset) ;
 
@@ -2668,7 +2642,7 @@ extern ssize_t pread (int __fd, void *__buf, size_t __nbytes,
 
 extern ssize_t pwrite (int __fd, const void *__buf, size_t __n,
          __off_t __offset) ;
-# 407 "/usr/include/unistd.h" 3 4
+# 404 "/usr/include/unistd.h" 3 4
 extern ssize_t pread64 (int __fd, void *__buf, size_t __nbytes,
    __off64_t __offset) ;
 
@@ -2688,9 +2662,9 @@ extern int pipe (int __pipedes[2]) throw () ;
 
 
 extern int pipe2 (int __pipedes[2], int __flags) throw () ;
-# 435 "/usr/include/unistd.h" 3 4
+# 432 "/usr/include/unistd.h" 3 4
 extern unsigned int alarm (unsigned int __seconds) throw ();
-# 447 "/usr/include/unistd.h" 3 4
+# 444 "/usr/include/unistd.h" 3 4
 extern unsigned int sleep (unsigned int __seconds);
 
 
@@ -2708,7 +2682,7 @@ extern __useconds_t ualarm (__useconds_t __value, __useconds_t __interval)
 
 
 extern int usleep (__useconds_t __useconds);
-# 472 "/usr/include/unistd.h" 3 4
+# 469 "/usr/include/unistd.h" 3 4
 extern int pause (void);
 
 
@@ -2742,7 +2716,7 @@ extern int chdir (const char *__path) throw () __attribute__ ((__nonnull__ (1)))
 
 
 extern int fchdir (int __fd) throw () ;
-# 514 "/usr/include/unistd.h" 3 4
+# 511 "/usr/include/unistd.h" 3 4
 extern char *getcwd (char *__buf, size_t __size) throw () ;
 
 
@@ -3495,7 +3469,7 @@ enum
     _CS_V7_ENV
 
   };
-# 613 "/usr/include/unistd.h" 2 3 4
+# 610 "/usr/include/unistd.h" 2 3 4
 
 
 extern long int pathconf (const char *__path, int __name)
@@ -3533,7 +3507,7 @@ extern __pid_t getpgid (__pid_t __pid) throw ();
 
 
 extern int setpgid (__pid_t __pid, __pid_t __pgid) throw ();
-# 663 "/usr/include/unistd.h" 3 4
+# 660 "/usr/include/unistd.h" 3 4
 extern int setpgrp (void) throw ();
 
 
@@ -3777,7 +3751,7 @@ extern int getopt (int ___argc, char *const *___argv, const char *__shortopts)
 extern "C" {
 # 49 "/usr/include/x86_64-linux-gnu/bits/getopt_posix.h" 3 4
 }
-# 873 "/usr/include/unistd.h" 2 3 4
+# 870 "/usr/include/unistd.h" 2 3 4
 
 
 
@@ -3890,17 +3864,17 @@ extern int getpagesize (void) throw () __attribute__ ((__const__));
 
 
 extern int getdtablesize (void) throw ();
-# 994 "/usr/include/unistd.h" 3 4
+# 991 "/usr/include/unistd.h" 3 4
 extern int truncate (const char *__file, __off_t __length)
      throw () __attribute__ ((__nonnull__ (1))) ;
-# 1006 "/usr/include/unistd.h" 3 4
+# 1003 "/usr/include/unistd.h" 3 4
 extern int truncate64 (const char *__file, __off64_t __length)
      throw () __attribute__ ((__nonnull__ (1))) ;
-# 1017 "/usr/include/unistd.h" 3 4
+# 1014 "/usr/include/unistd.h" 3 4
 extern int ftruncate (int __fd, __off_t __length) throw () ;
-# 1027 "/usr/include/unistd.h" 3 4
+# 1024 "/usr/include/unistd.h" 3 4
 extern int ftruncate64 (int __fd, __off64_t __length) throw () ;
-# 1038 "/usr/include/unistd.h" 3 4
+# 1035 "/usr/include/unistd.h" 3 4
 extern int brk (void *__addr) throw () ;
 
 
@@ -3908,13 +3882,13 @@ extern int brk (void *__addr) throw () ;
 
 
 extern void *sbrk (intptr_t __delta) throw ();
-# 1059 "/usr/include/unistd.h" 3 4
+# 1056 "/usr/include/unistd.h" 3 4
 extern long int syscall (long int __sysno, ...) throw ();
-# 1082 "/usr/include/unistd.h" 3 4
+# 1079 "/usr/include/unistd.h" 3 4
 extern int lockf (int __fd, int __cmd, __off_t __len) ;
-# 1092 "/usr/include/unistd.h" 3 4
+# 1089 "/usr/include/unistd.h" 3 4
 extern int lockf64 (int __fd, int __cmd, __off64_t __len) ;
-# 1110 "/usr/include/unistd.h" 3 4
+# 1107 "/usr/include/unistd.h" 3 4
 ssize_t copy_file_range (int __infd, __off64_t *__pinoff,
     int __outfd, __off64_t *__poutoff,
     size_t __length, unsigned int __flags);
@@ -3924,20 +3898,10 @@ ssize_t copy_file_range (int __infd, __off64_t *__pinoff,
 
 
 extern int fdatasync (int __fildes);
-
-
-
-
-
-
-
+# 1124 "/usr/include/unistd.h" 3 4
 extern char *crypt (const char *__key, const char *__salt)
      throw () __attribute__ ((__nonnull__ (1, 2)));
 
-
-
-extern void encrypt (char *__glibc_block, int __edflag)
-     throw () __attribute__ ((__nonnull__ (1)));
 
 
 
@@ -3946,17 +3910,16 @@ extern void encrypt (char *__glibc_block, int __edflag)
 
 extern void swab (const void *__restrict __from, void *__restrict __to,
     ssize_t __n) throw () __attribute__ ((__nonnull__ (1, 2)));
-# 1167 "/usr/include/unistd.h" 3 4
+# 1161 "/usr/include/unistd.h" 3 4
 int getentropy (void *__buffer, size_t __length) ;
-
-
-
-
-
-
+# 1170 "/usr/include/unistd.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/unistd_ext.h" 1 3 4
+# 34 "/usr/include/x86_64-linux-gnu/bits/unistd_ext.h" 3 4
+extern __pid_t gettid (void) throw ();
+# 1171 "/usr/include/unistd.h" 2 3 4
 
 }
-# 44 "./api/api_parser.h" 2
+# 50 "./api/api_parser.h" 2
 # 1 "/usr/include/string.h" 1 3 4
 # 26 "/usr/include/string.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -3967,9 +3930,9 @@ extern "C" {
 
 
 
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
 # 34 "/usr/include/string.h" 2 3 4
-# 42 "/usr/include/string.h" 3 4
+# 43 "/usr/include/string.h" 3 4
 extern void *memcpy (void *__restrict __dest, const void *__restrict __src,
        size_t __n) throw () __attribute__ ((__nonnull__ (1, 2)));
 
@@ -4002,9 +3965,9 @@ extern void *memchr (void *__s, int __c, size_t __n)
       throw () __asm ("memchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
 extern const void *memchr (const void *__s, int __c, size_t __n)
       throw () __asm ("memchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
-# 88 "/usr/include/string.h" 3 4
+# 89 "/usr/include/string.h" 3 4
 }
-# 98 "/usr/include/string.h" 3 4
+# 99 "/usr/include/string.h" 3 4
 extern "C++" void *rawmemchr (void *__s, int __c)
      throw () __asm ("rawmemchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
 extern "C++" const void *rawmemchr (const void *__s, int __c)
@@ -4020,7 +3983,7 @@ extern "C++" void *memrchr (void *__s, int __c, size_t __n)
       throw () __asm ("memrchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
 extern "C++" const void *memrchr (const void *__s, int __c, size_t __n)
       throw () __asm ("memrchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
-# 121 "/usr/include/string.h" 3 4
+# 122 "/usr/include/string.h" 3 4
 extern char *strcpy (char *__restrict __dest, const char *__restrict __src)
      throw () __attribute__ ((__nonnull__ (1, 2)));
 
@@ -4076,14 +4039,14 @@ extern char *strdup (const char *__s)
 
 extern char *strndup (const char *__string, size_t __n)
      throw () __attribute__ ((__malloc__)) __attribute__ ((__nonnull__ (1)));
-# 203 "/usr/include/string.h" 3 4
+# 204 "/usr/include/string.h" 3 4
 extern "C++"
 {
 extern char *strchr (char *__s, int __c)
      throw () __asm ("strchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
 extern const char *strchr (const char *__s, int __c)
      throw () __asm ("strchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
-# 223 "/usr/include/string.h" 3 4
+# 224 "/usr/include/string.h" 3 4
 }
 
 
@@ -4097,14 +4060,14 @@ extern char *strrchr (char *__s, int __c)
      throw () __asm ("strrchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
 extern const char *strrchr (const char *__s, int __c)
      throw () __asm ("strrchr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
-# 250 "/usr/include/string.h" 3 4
+# 251 "/usr/include/string.h" 3 4
 }
-# 260 "/usr/include/string.h" 3 4
+# 261 "/usr/include/string.h" 3 4
 extern "C++" char *strchrnul (char *__s, int __c)
      throw () __asm ("strchrnul") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
 extern "C++" const char *strchrnul (const char *__s, int __c)
      throw () __asm ("strchrnul") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1)));
-# 272 "/usr/include/string.h" 3 4
+# 273 "/usr/include/string.h" 3 4
 extern size_t strcspn (const char *__s, const char *__reject)
      throw () __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 2)));
 
@@ -4119,7 +4082,7 @@ extern char *strpbrk (char *__s, const char *__accept)
      throw () __asm ("strpbrk") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 2)));
 extern const char *strpbrk (const char *__s, const char *__accept)
      throw () __asm ("strpbrk") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 2)));
-# 300 "/usr/include/string.h" 3 4
+# 301 "/usr/include/string.h" 3 4
 }
 
 
@@ -4133,7 +4096,7 @@ extern char *strstr (char *__haystack, const char *__needle)
      throw () __asm ("strstr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 2)));
 extern const char *strstr (const char *__haystack, const char *__needle)
      throw () __asm ("strstr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 2)));
-# 327 "/usr/include/string.h" 3 4
+# 328 "/usr/include/string.h" 3 4
 }
 
 
@@ -4165,7 +4128,7 @@ extern "C++" char *strcasestr (char *__haystack, const char *__needle)
 extern "C++" const char *strcasestr (const char *__haystack,
          const char *__needle)
      throw () __asm ("strcasestr") __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 2)));
-# 368 "/usr/include/string.h" 3 4
+# 369 "/usr/include/string.h" 3 4
 extern void *memmem (const void *__haystack, size_t __haystacklen,
        const void *__needle, size_t __needlelen)
      throw () __attribute__ ((__pure__)) __attribute__ ((__nonnull__ (1, 3)));
@@ -4195,7 +4158,7 @@ extern size_t strnlen (const char *__string, size_t __maxlen)
 
 
 extern char *strerror (int __errnum) throw ();
-# 420 "/usr/include/string.h" 3 4
+# 421 "/usr/include/string.h" 3 4
 extern char *strerror_r (int __errnum, char *__buf, size_t __buflen)
      throw () __attribute__ ((__nonnull__ (2))) ;
 
@@ -4209,7 +4172,7 @@ extern char *strerror_l (int __errnum, locale_t __l) throw ();
 
 # 1 "/usr/include/strings.h" 1 3 4
 # 23 "/usr/include/strings.h" 3 4
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h" 1 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
 # 24 "/usr/include/strings.h" 2 3 4
 
 
@@ -4292,7 +4255,7 @@ extern int strncasecmp_l (const char *__s1, const char *__s2,
 
 
 }
-# 432 "/usr/include/string.h" 2 3 4
+# 433 "/usr/include/string.h" 2 3 4
 
 
 
@@ -4346,14 +4309,18 @@ extern "C++" char *basename (char *__filename)
      throw () __asm ("basename") __attribute__ ((__nonnull__ (1)));
 extern "C++" const char *basename (const char *__filename)
      throw () __asm ("basename") __attribute__ ((__nonnull__ (1)));
-# 498 "/usr/include/string.h" 3 4
+# 499 "/usr/include/string.h" 3 4
 }
-# 45 "./api/api_parser.h" 2
+# 51 "./api/api_parser.h" 2
 
 
 # 1 "/usr/include/regex.h" 1 3 4
 # 27 "/usr/include/regex.h" 3 4
 extern "C" {
+# 55 "/usr/include/regex.h" 3 4
+typedef unsigned int __re_size_t;
+typedef unsigned long int __re_long_size_t;
+
 
 
 
@@ -4369,51 +4336,47 @@ typedef unsigned long int active_reg_t;
 
 
 typedef unsigned long int reg_syntax_t;
-# 181 "/usr/include/regex.h" 3 4
+# 211 "/usr/include/regex.h" 3 4
 extern reg_syntax_t re_syntax_options;
-# 308 "/usr/include/regex.h" 3 4
+# 346 "/usr/include/regex.h" 3 4
 typedef enum
 {
-
-  REG_ENOSYS = -1,
-
-
-  REG_NOERROR = 0,
-  REG_NOMATCH,
+  _REG_ENOSYS = -1,
+  _REG_NOERROR = 0,
+  _REG_NOMATCH,
 
 
 
-  REG_BADPAT,
-  REG_ECOLLATE,
-  REG_ECTYPE,
-  REG_EESCAPE,
-  REG_ESUBREG,
-  REG_EBRACK,
-  REG_EPAREN,
-  REG_EBRACE,
-  REG_BADBR,
-  REG_ERANGE,
-  REG_ESPACE,
-  REG_BADRPT,
+  _REG_BADPAT,
+  _REG_ECOLLATE,
+  _REG_ECTYPE,
+  _REG_EESCAPE,
+  _REG_ESUBREG,
+  _REG_EBRACK,
+  _REG_EPAREN,
+  _REG_EBRACE,
+  _REG_BADBR,
+  _REG_ERANGE,
+  _REG_ESPACE,
+  _REG_BADRPT,
 
 
-  REG_EEND,
-  REG_ESIZE,
-  REG_ERPAREN
+  _REG_EEND,
+  _REG_ESIZE,
+  _REG_ERPAREN
 } reg_errcode_t;
-# 357 "/usr/include/regex.h" 3 4
+# 413 "/usr/include/regex.h" 3 4
 struct re_pattern_buffer
 {
 
 
-
-  unsigned char *buffer;
-
-
-  unsigned long int allocated;
+  struct re_dfa_t *buffer;
 
 
-  unsigned long int used;
+  __re_long_size_t allocated;
+
+
+  __re_long_size_t used;
 
 
   reg_syntax_t syntax;
@@ -4437,7 +4400,7 @@ struct re_pattern_buffer
 
 
   unsigned can_be_null : 1;
-# 402 "/usr/include/regex.h" 3 4
+# 457 "/usr/include/regex.h" 3 4
   unsigned regs_allocated : 2;
 
 
@@ -4460,9 +4423,9 @@ struct re_pattern_buffer
 };
 
 typedef struct re_pattern_buffer regex_t;
-
-
+# 490 "/usr/include/regex.h" 3 4
 typedef int regoff_t;
+
 
 
 
@@ -4470,11 +4433,11 @@ typedef int regoff_t;
 
 struct re_registers
 {
-  unsigned num_regs;
+  __re_size_t num_regs;
   regoff_t *start;
   regoff_t *end;
 };
-# 452 "/usr/include/regex.h" 3 4
+# 517 "/usr/include/regex.h" 3 4
 typedef struct
 {
   regoff_t rm_so;
@@ -4487,7 +4450,7 @@ typedef struct
 
 
 extern reg_syntax_t re_set_syntax (reg_syntax_t __syntax);
-# 473 "/usr/include/regex.h" 3 4
+# 538 "/usr/include/regex.h" 3 4
 extern const char *re_compile_pattern (const char *__pattern, size_t __length,
            struct re_pattern_buffer *__buffer);
 
@@ -4503,42 +4466,47 @@ extern int re_compile_fastmap (struct re_pattern_buffer *__buffer);
 
 
 
-extern int re_search (struct re_pattern_buffer *__buffer, const char *__string,
-        int __length, int __start, int __range,
-        struct re_registers *__regs);
+extern regoff_t re_search (struct re_pattern_buffer *__buffer,
+      const char *__String, regoff_t __length,
+      regoff_t __start, regoff_t __range,
+      struct re_registers *__regs);
 
 
 
 
-extern int re_search_2 (struct re_pattern_buffer *__buffer,
-   const char *__string1, int __length1,
-   const char *__string2, int __length2, int __start,
-   int __range, struct re_registers *__regs, int __stop);
+extern regoff_t re_search_2 (struct re_pattern_buffer *__buffer,
+        const char *__string1, regoff_t __length1,
+        const char *__string2, regoff_t __length2,
+        regoff_t __start, regoff_t __range,
+        struct re_registers *__regs,
+        regoff_t __stop);
 
 
 
 
-extern int re_match (struct re_pattern_buffer *__buffer, const char *__string,
-       int __length, int __start, struct re_registers *__regs);
+extern regoff_t re_match (struct re_pattern_buffer *__buffer,
+     const char *__String, regoff_t __length,
+     regoff_t __start, struct re_registers *__regs);
 
 
 
-extern int re_match_2 (struct re_pattern_buffer *__buffer,
-         const char *__string1, int __length1,
-         const char *__string2, int __length2, int __start,
-         struct re_registers *__regs, int __stop);
-# 526 "/usr/include/regex.h" 3 4
+extern regoff_t re_match_2 (struct re_pattern_buffer *__buffer,
+       const char *__string1, regoff_t __length1,
+       const char *__string2, regoff_t __length2,
+       regoff_t __start, struct re_registers *__regs,
+       regoff_t __stop);
+# 596 "/usr/include/regex.h" 3 4
 extern void re_set_registers (struct re_pattern_buffer *__buffer,
          struct re_registers *__regs,
-         unsigned int __num_regs,
+         __re_size_t __num_regs,
          regoff_t *__starts, regoff_t *__ends);
-# 562 "/usr/include/regex.h" 3 4
+# 639 "/usr/include/regex.h" 3 4
 extern int regcomp (regex_t *__restrict __preg,
       const char *__restrict __pattern,
       int __cflags);
 
 extern int regexec (const regex_t *__restrict __preg,
-      const char *__restrict __string, size_t __nmatch,
+      const char *__restrict __String, size_t __nmatch,
       regmatch_t __pmatch[],
       int __eflags);
 
@@ -4550,15 +4518,12 @@ extern void regfree (regex_t *__preg);
 
 
 }
-# 48 "./api/api_parser.h" 2
+# 54 "./api/api_parser.h" 2
 
 # 1 "./api/api.h" 1
+# 11 "./api/api.h"
 
-
-
-
-
-# 5 "./api/api.h"
+# 11 "./api/api.h"
 extern "C" {
 
 
@@ -4664,7 +4629,7 @@ const char *apiCmdStatus(enum APICmdStatus cmdStatus);
 
 
 }
-# 50 "./api/api_parser.h" 2
+# 56 "./api/api_parser.h" 2
 
 enum APICmdName currCmd = API_UNINITED;
 
@@ -4674,19 +4639,19 @@ static int regInit = 0;
 
 char *executeAPICommand(const char *request, int *exit_flag) {
     char *cmdStr, *reply = 
-# 58 "./api/api_parser.h" 3 4
+# 64 "./api/api_parser.h" 3 4
                           __null
-# 58 "./api/api_parser.h"
+# 64 "./api/api_parser.h"
                               ;
-    printf("[API] REQUEST: %s\n", request);
+    printf("[API] REQUEST: %s", request);
     if (regInit == 0) {
         int res = regcomp(&cmdRegEx, cmdRegTemplate, 
-# 61 "./api/api_parser.h" 3 4
+# 67 "./api/api_parser.h" 3 4
                                                     1
-# 61 "./api/api_parser.h"
+# 67 "./api/api_parser.h"
                                                                 );
         if (res != 0) {
-            printf("Wrong template\n");
+            printf("Wrong template");
             return 0;
         }
         regInit = 1;
@@ -4698,7 +4663,7 @@ char *executeAPICommand(const char *request, int *exit_flag) {
     }
 
     int clientId = (parts[2].rm_eo - parts[2].rm_so > 0) ? (request[parts[2].rm_so + strlen("/client/")] - '0') : 0;
-# 107 "./api/api_parser.h"
+# 116 "./api/api_parser.h"
 # 1 "./api/api.inl" 1
 # 22 "./api/api.inl"
 enum __api_switch_type {
@@ -4708,23 +4673,23 @@ enum __api_switch_type {
     __API_SWITCH_TYPE_OK_OK
 };
 
-if (strncmp(request + parts[3].rm_so, "uninited", strlen("uninited")) == 0) { currCmd = API_UNINITED; if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""UNINITED"); apiUninited(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""UNINITED"); apiUninited(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""UNINITED"); apiUninited(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "init", strlen("init")) == 0) { currCmd = API_INIT; if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""INIT"); apiInit(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""INIT"); apiInit(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""INIT"); apiInit(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "start", strlen("start")) == 0) { currCmd = API_START; if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""START"); apiStart(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""START"); apiStart(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""START"); apiStart(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "finish", strlen("finish")) == 0) { currCmd = API_FINISH; if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""FINISH"); apiFinish(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""FINISH"); apiFinish(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""FINISH"); apiFinish(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "status", strlen("status")) == 0) { currCmd = API_STATUS; if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""STATUS"); apiStatus(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""STATUS"); apiStatus(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""STATUS"); apiStatus(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "grab", strlen("grab")) == 0) { currCmd = API_GRAB; if (__API_SWITCH_TYPE_OK_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""GRAB"); apiGrab(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_OK_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_OK_UNKNOWN == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""GRAB"); apiGrab(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_OK_UNKNOWN == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""GRAB"); apiGrab(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "live", strlen("live")) == 0) { currCmd = API_LIVE; if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""LIVE"); apiLive(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""LIVE"); apiLive(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""LIVE"); apiLive(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "control", strlen("control")) == 0) { currCmd = API_CONTROL; if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""CONTROL"); apiControl(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""CONTROL"); apiControl(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_UNKNOWN == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""CONTROL"); apiControl(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "clean", strlen("clean")) == 0) { currCmd = API_CLEAN; if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""CLEAN"); apiClean(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""CLEAN"); apiClean(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_UNKNOWN_OK == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""CLEAN"); apiClean(cmdStr, exit_flag); } } else
-if (strncmp(request + parts[3].rm_so, "stop", strlen("stop")) == 0) { currCmd = API_STOP; if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_UNKNOWN_OK) { if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""STOP"); apiStop(cmdStr, exit_flag); } } else if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_UNKNOWN_UNKNOWN) { asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_OK_UNKNOWN) { if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""STOP"); apiStop(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else if (__API_SWITCH_TYPE_OK_OK == __API_SWITCH_TYPE_OK_OK) { asprintf(&cmdStr, "scripts/API_""STOP"); apiStop(cmdStr, exit_flag); } } else
-# 108 "./api/api_parser.h" 2
+if (strncmp(request + parts[3].rm_so, "uninited", strlen("uninited")) == 0) { currCmd = API_UNINITED; asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else
+if (strncmp(request + parts[3].rm_so, "init", strlen("init")) == 0) { currCmd = API_INIT; if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""INIT"); apiInit(cmdStr, exit_flag); } } else
+if (strncmp(request + parts[3].rm_so, "start", strlen("start")) == 0) { currCmd = API_START; if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""START"); apiStart(cmdStr, exit_flag); } } else
+if (strncmp(request + parts[3].rm_so, "finish", strlen("finish")) == 0) { currCmd = API_FINISH; if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""FINISH"); apiFinish(cmdStr, exit_flag); } } else
+if (strncmp(request + parts[3].rm_so, "status", strlen("status")) == 0) { currCmd = API_STATUS; asprintf(&cmdStr, "scripts/API_""STATUS"); apiStatus(cmdStr, exit_flag); } else
+if (strncmp(request + parts[3].rm_so, "grab", strlen("grab")) == 0) { currCmd = API_GRAB; if (clientId > 0) { asprintf(&cmdStr, "scripts/API_""GRAB"); apiGrab(cmdStr, exit_flag); } else { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } } else
+if (strncmp(request + parts[3].rm_so, "live", strlen("live")) == 0) { currCmd = API_LIVE; asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else
+if (strncmp(request + parts[3].rm_so, "control", strlen("control")) == 0) { currCmd = API_CONTROL; asprintf(&reply, "ER017{%d,,wrong command}", currCmd); return reply; } else
+if (strncmp(request + parts[3].rm_so, "clean", strlen("clean")) == 0) { currCmd = API_CLEAN; if (clientId > 0) { asprintf(&reply, "ER00C{%d,,unknown}", currCmd); return reply; } else { asprintf(&cmdStr, "scripts/API_""CLEAN"); apiClean(cmdStr, exit_flag); } } else
+if (strncmp(request + parts[3].rm_so, "stop", strlen("stop")) == 0) { currCmd = API_STOP; asprintf(&cmdStr, "scripts/API_""STOP"); apiStop(cmdStr, exit_flag); } else
+# 117 "./api/api_parser.h" 2
     {
         asprintf(&reply, "ER014{%d,,unknown command}", currCmd);
         return reply;
     }
 
-    printf("Executed %s:\n", cmdStr);
+    printf("Executed %s:", cmdStr);
 
     if (!reply) asprintf(&reply,"ER011{%d,,empty answer}", currCmd);
 
