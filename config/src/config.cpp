@@ -75,7 +75,7 @@ int model_read_configuration(const char *fileName, module_t **target) {
     int first = -1; // for checking
     int null_name_exist = 0; // for checking
     for (int i = 0; it != jsonObj.end(); ++it, ++i) {
-        /* parse (*it) to modules[id] */
+        /* parse (*it) to modules[i] */
         try {
             modules[i].id = (*it)["id"];
             std::vector<std::string> params = 

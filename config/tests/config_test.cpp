@@ -1,7 +1,7 @@
 #include "config/config.h"
 
 #include <gtest/gtest.h>
-#include <glog/logging.h>
+//#include <glog/logging.h>
 
 namespace {
 
@@ -10,6 +10,11 @@ class configTest : public ::testing::Test { };
 //const std::string test_folder = "../config/tests/"; // for running from "build"
 //const std::string test_folder = "../../config/tests/"; // for running from "build/bin"
 std::string test_folder;
+
+TEST_F(configTest, modules_test) {
+    module_t *m;
+    module_t_clean_up(&m, -1, -1);
+}
 
 TEST_F(configTest, good_test_json) {
     module_t *m = NULL;
@@ -55,10 +60,11 @@ TEST_F(configTest, extra_check_test_json) {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        std::cout << "Usage: " << argv[0] << " ../config/tests/" << std::endl;
-        return -1;
+        std::cout << "Please, use: " << argv[0] << " ../config/tests/" << std::endl;
+        test_folder = "../config/tests/"; //"/home/alin/test/multiprocessor/config/tests/";
+    } else {
+        test_folder = argv[1];
     }
-    test_folder = argv[1];
     ::testing::InitGoogleTest/*(NULL, static_cast<char **>(NULL));*/(&argc, argv);
     //google::InitGoogleLogging/*(NULL);*/(argv[1]);
     //google::InstallFailureSignalHandler();

@@ -16,7 +16,6 @@ extern "C" {
 
 int model_read_configuration(const char *fileName, module_t **target);
 
-
 inline void module_t_clean_up(module_t **modules, int size, int until) {
     if (until == -1) {
         until = size;

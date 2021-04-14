@@ -8,6 +8,8 @@ project(${PROJECT_NAME}
     LANGUAGES C CXX
 )
 
+#list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
 find_package(Glog REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
@@ -40,10 +42,10 @@ target_link_libraries(${PROJECT_NAME} glog::glog)
 
 # Test
 enable_testing()
-#find_package(GTest REQUIRED)
-#include_directories(${GTEST_INCLUDE_DIR})
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIR})
+
 add_executable(config_test tests/config_test.cpp)
 target_link_libraries(config_test gtest pthread gtest gtest_main) #${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARIES}
-#target_link_libraries(config_test)
 target_link_libraries(config_test ${PROJECT_NAME})
-#add_test(config-test config_test)
+add_test(NAME config-tests COMMAND $<TARGET_FILE:config_test>)
