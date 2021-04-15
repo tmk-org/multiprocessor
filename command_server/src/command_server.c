@@ -14,6 +14,7 @@
 static struct model_desc *mdesc = NULL;
 
 static struct ring_buffer *cmd_ring = NULL;
+static sem_t command_ready;
 
 int executeAPICommand(const char *cmd, int *exit_flag) {
     fprintf(stdout, "[command_server]: TODO real execute command by api\n");
@@ -77,10 +78,12 @@ int push_new_command(int fd, const char *request) {
     fprintf(stdout, "[command_server]: put to queue new command %s\n", new_cmd->full_command);
     fflush(stdout);
     ring_buffer_push(cmd_ring, (size_t)new_cmd);
+    sem_post(&command_ready);
     return 0;
 }
 
 command_t *pop_next_command() {
+    sem_wait(&command_ready);
     return (command_t*)ring_buffer_pop(cmd_ring);
 }
 
