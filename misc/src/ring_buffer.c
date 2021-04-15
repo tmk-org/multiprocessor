@@ -5,13 +5,13 @@
 #include "misc/ring_buffer.h"
 
 struct ring_buffer * ring_buffer_create(int max_cnt, int empty){
-    size_t		size;
-    struct ring_buffer	*ring;
+    size_t size;
+    struct ring_buffer *ring;
     size = sizeof(struct ring_buffer) + max_cnt * sizeof(size_t);
     ring = malloc(size);
     if (ring == NULL){
-	fprintf(stderr, "Error: can't allocate memory for ring buffer\n");
-	return NULL;
+        fprintf(stderr, "Error: can't allocate memory for ring buffer\n");
+        return NULL;
     }
 
     memset(ring, 0, size);
@@ -21,9 +21,9 @@ struct ring_buffer * ring_buffer_create(int max_cnt, int empty){
     pthread_mutex_init(&ring->mutex, NULL);
 
     if (sem_init(&ring->sem, 0, empty ? 0 : max_cnt) == -1){
-	fprintf(stderr, "Error: can't init ring buffer semaphore\n");
-	free(ring);
-	return NULL;
+        fprintf(stderr, "Error: can't init ring buffer semaphore\n");
+        free(ring);
+        return NULL;
     }
 
     return ring;

@@ -31,17 +31,19 @@ include_directories(${CMAKE_SOURCE_DIR}/../misc/include)
 include_directories(${CMAKE_SOURCE_DIR}/../shmem/include)
 include_directories(${CMAKE_SOURCE_DIR}/../tcp/include)
 include_directories(${CMAKE_SOURCE_DIR}/../pmngr/include)
+include_directories(${CMAKE_SOURCE_DIR}/../config/include)
+include_directories(${CMAKE_SOURCE_DIR}/../command_server/include)
 
 add_library(${PROJECT_NAME} SHARED
     #header
     include/model/model.h
-    include/model/command_server.h
+    #include/model/command_server.h
     #sources
-    src/command_server.c
+    #src/command_server.c
     src/model.c
 )
 
-target_link_libraries(${PROJECT_NAME} misc shmem pmngr tcp)
+target_link_libraries(${PROJECT_NAME} misc shmem pmngr tcp config)
 
 target_include_directories (${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -58,7 +60,7 @@ add_executable(mfilter components/filter.c)
 target_link_libraries(mfilter ${PROJECT_NAME} shmem pmngr)
 
 add_executable(mserver components/server.c)
-target_link_libraries(mserver ${PROJECT_NAME} shmem pmngr model tcp)
+target_link_libraries(mserver ${PROJECT_NAME} shmem pmngr cmdsrv model tcp)
 
 add_executable(mmanager components/manager.c)
 target_link_libraries(mmanager tcp)

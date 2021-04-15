@@ -1,5 +1,3 @@
-#include <getopt.h>
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,380 +17,348 @@
 
 #include <unistd.h>
 
+#include "misc/list.h"
 #include "tcp/tcp_process.h"
 
-#define MAX_CONNECTION	10
+#define MESSAGE_LEN 512
 
-#if 0
-struct connection{
-    LIST		entry;
-    FILE		*f;
-    int			broken;
-    char		buffer[MAX_BUFFER_SIZE];
-    size_t		buffer_used;
 
-    int			player;
+struct server {
+    int connection_cnt;
+    list_t connection_list;
 };
-#endif
 
-char *defaultExecuteCommand(const char *buf, int *exit_flag) {
-    fprintf(stdout, "[defaultExecuteCommand]: TODO execute_command_function\n");
+//char *default_command_executor(struct connection *connection, int *exit_flag) {
+const char *default_server_reciever(struct connection *connection, int *exit_flag) {
+    fprintf(stdout, "[default_server_reciever]: we are IN the server reciever\n");
     fflush(stdout);
-    if (strcasecmp(buf, "STOP") == 0 || strcasecmp(buf, "S") == 0) {
-        fprintf(stdout, "[defaultExecuteCommand]: STOP command recieved\n");
+    if (!connection) return NULL;
+    char *buf = connection->request;
+    if (strcasecmp(buf, "STOP") == 0 || strcasecmp(buf, "S") == 0 ||
+        strcasecmp(buf, "QUIT") == 0 || strcasecmp(buf, "Q") == 0 ||
+        strcasecmp(buf, "EXIT") == 0) {
+        fprintf(stdout, "[default_command_executor]: stop server command recieved\n");
         fflush(stdout);
         *exit_flag = 1;
+        sprintf(connection->reply, "RE%lx{0:%d, stop command recieved}\n", (ssize_t)28, connection->fd);
     }
-    return strdup("OK\n");
+    else {
+        sprintf(connection->reply, "RE%lx{0:%d,%s,recieved ok}", strlen(connection->request) + 24 + 2, connection->fd, connection->request);
+    }
+    connection->reply_used = strlen(connection->reply);
+    return (char*)connection->reply;
 }
 
-char *getRequest() {
-    static char s[80];
-    fprintf(stdout, "Message: ");
+//char *sample_callback(struct connection *connection, int *exit_flag) {
+const char *default_server_sender(struct connection *connection, int *exit_flag) {
+    fprintf(stdout, "[default_server_sender]: we are IN the server sender\n");
     fflush(stdout);
-	memset(s, 0, sizeof(s));
-	scanf("%78[^\n]%*c", s);
-	strcat(s, "\n");
-    return s;
-}
-
-int checkReply(char *buf) {
-    if (buf != NULL) {
-        return 0;
+#if 0
+    int i = 0;
+    //TODO: ???? something not good with this idea
+    strcpy(connection->reply, "{sample_callback} please, wait...");
+    while (strcmp(connection->reply, "") != 0 && ++i < 10) {
+        write(connection->fd, connection->reply, strlen(connection->reply));
+        sleep(1);
     }
-    return -1;
+    strcpy(connection->reply, "{sample_callback} reciever is ok");
+#else
+    sprintf(connection->reply, "RE%lx{0:%d,%s,sent from sender ok}", strlen(connection->request) + 32 + 2, connection->fd, connection->request);
+    connection->reply_used = strlen(connection->reply);
+#endif
+    return (char*)connection->reply;
 }
 
-//int tcp_server_process(char *port){
-int tcp_server_process(char *port, char *(*exec_cmd) (const char *, int *)){
-    int			exit_flag = 0, fd, client_cnt = 0;
-    int			cfd[MAX_CONNECTION];
+struct connection *connection_add(void *ptr, int fd){
+    struct server *srv = (struct server *)ptr;
+    struct connection *connection = (struct connection *)malloc(sizeof(struct connection));
+    if (connection == NULL) return NULL;
+    memset(connection, 0, sizeof(struct connection));
+    connection->fd = fd;
+    if (srv) {
+        list_add_back(&srv->connection_list, &connection->entry);
+        srv->connection_cnt++;
+    }
+    return connection;
+}
 
-    struct addrinfo	hints;
-    struct addrinfo	*result, *rp;
-    int			rc, reuse_addr;
-    
-    if (exec_cmd == NULL) exec_cmd = defaultExecuteCommand; 
+void connection_delete(void *ptr, struct connection *connection){
+    struct server *srv = (struct server *)ptr;
+    if (srv) {
+        list_remove_elem(&srv->connection_list, &connection->entry);
+        srv->connection_cnt--;
+    }
+    close(connection->fd);
+    free(connection);
+}
+
+struct connection *connection_get(struct server *srv, int fd){
+    list_t *item;
+    struct connection *connection;
+
+    item = list_first_elem(&srv->connection_list);
+    while(list_is_valid_elem(&srv->connection_list, item)){
+        connection = list_entry(item, struct connection, entry);
+        if (connection->fd == fd) return connection;
+        item = item->next;
+    }
+    return NULL;
+}
+
+#if 0
+void connection_set_broken(struct server *srv, struct connection *connection){
+    connection->broken = 1;
+    //TODO: check it ???
+}
+
+void connection_delete_broken(struct server *srv){
+    list_t *item;
+    struct connection *connection;
+
+    item = list_first_elem(&srv->connection_list);
+    while (list_is_valid_elem(&srv->connection_list, item)) {
+        connection = list_entry(item, struct connection, entry);
+        item = item->next;
+        if (!connection->broken) continue;
+        connection_delete(srv, connection);
+    }
+}
+
+int connection_restart(struct server *srv, struct connection *connection){
+    //TODO: ???
+    return 1;
+}
+#endif
+
+//ATTENTION: memory for server should be allocated before init
+int server_init(struct server *srv){
+    memset(srv, 0, sizeof(struct server));
+    //srv->state = SERVER_STOPPED;
+    list_init(&srv->connection_list);
+    return 0;
+}
+
+void server_destroy(struct server *srv){
+    list_t *item;
+    struct connection *connection;
+
+    //srv->state = SERVER_STOPPED;
+    while(!list_is_empty(&srv->connection_list)){
+            item = list_first_elem(&srv->connection_list);
+        connection = list_entry(item, struct connection, entry);
+        connection_delete(srv, connection);
+    }
+}
+
+int tcp_server_process(char *port,char *(*reciever) (struct connection *, int *exit_flag), char * (*sender) (struct connection *, int *exit_flag)) {
+    int exit_flag = 0;
+    int fd;
+
+    struct server srv;
+    server_init(&srv);
+
+    struct addrinfo hints;
+    struct addrinfo *result, *rp;
+    int rc, reuse_addr;
 
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_UNSPEC;     
+    hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;    
-    hints.ai_protocol = 0;     
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_protocol = 0;
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
     rc = getaddrinfo(NULL, port, &hints, &result);
     if (rc != 0) {
-	    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
-	    fflush(stderr);
-	    exit(EXIT_FAILURE);
+        fprintf(stderr, "[tcp_server_process]: getaddrinfo error %s\n", gai_strerror(rc));
+        fflush(stderr);
+        exit(EXIT_FAILURE);
     }
 
     for (rp = result; rp != NULL; rp = rp->ai_next) {
-	    fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-	    if (fd == -1) continue;
+        fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (fd == -1) continue;
 
-	    reuse_addr=1;
-	    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr)) != 0) {
-	        close(fd);
-	        continue;
-	    }
+        reuse_addr=1;
+        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr)) != 0) {
+            close(fd);
+            continue;
+        }
 
-	    if (bind(fd, rp->ai_addr, rp->ai_addrlen) == 0) break;
-	    close(fd);
+        if (bind(fd, rp->ai_addr, rp->ai_addrlen) == 0) break;
+        close(fd);
     }
 
     if (rp == NULL) {
-	    fprintf(stderr, "Could not bind\n");
-	    fflush(stderr);
-	    exit(EXIT_FAILURE);
+        fprintf(stderr, "[tcp_server_process]: could not bind\n");
+        fflush(stderr);
+        exit(EXIT_FAILURE);
     }
 
     freeaddrinfo(result);
 
     if (listen(fd, 10) != 0){
-	    fprintf(stderr, "Could not listen, error: %s\n", strerror(errno));
-	    fflush(stderr);
-	    exit(EXIT_FAILURE);
+        fprintf(stderr, "[tcp_server_process]: could not listen with error: %s\n", strerror(errno));
+        fflush(stderr);
+        exit(EXIT_FAILURE);
     }
 
     while(!exit_flag){
-	    fd_set	rfds;
-	    int	i, retval, max;
+        fd_set rfds;
+        int i, retval, max;
+        list_t *item;
+        struct connection *connection;
+        FD_ZERO(&rfds);
 
-	    FD_ZERO(&rfds);
+        max = fd;
+        FD_SET(fd, &rfds);
 
-	    max = fd;
-	    FD_SET(fd, &rfds);
-	    for(i = 0; i < client_cnt; i++){
-		    if (cfd[i] > max) max = cfd[i];
-		    FD_SET(cfd[i], &rfds);
-	    }
+        item = list_first_elem(&srv.connection_list);
+        while(list_is_valid_elem(&srv.connection_list, item)){
+            connection = list_entry(item, struct connection, entry);
+            item = item->next;
+            //if (connection->broken) continue;
+            if (connection->fd > max) max = connection->fd;
+            FD_SET(connection->fd, &rfds);
+        }
 
-	    retval = select(max + 1, &rfds, NULL, NULL, NULL);
-	    if (retval == -1){
-	        fprintf(stderr, "Could not select, error: %s\n", strerror(errno));
-	        fflush(stderr);
-	        exit(EXIT_FAILURE);
-	    }
+        retval = select(max + 1, &rfds, NULL, NULL, NULL);
+        if (retval == -1){
+            fprintf(stderr, "[tcp_server_process]: could not select with error: %s\n", strerror(errno));
+            fflush(stderr);
+            exit(EXIT_FAILURE);
+        }
 
-	    if (FD_ISSET(fd, &rfds)){
-	        //new connection
-	        struct sockaddr_storage	peer_addr;
-	        socklen_t			peer_addr_len;
-	        char			host[NI_MAXHOST], service[NI_MAXSERV];
-	        int				fd1;
+        if (FD_ISSET(fd, &rfds)){
+            //new connection
+            struct sockaddr_storage peer_addr;
+            socklen_t peer_addr_len;
+            char host[NI_MAXHOST], service[NI_MAXSERV];
+            int fd1;
 
-	        peer_addr_len = sizeof(peer_addr);
-	        fd1 = accept(fd, (struct sockaddr *) &peer_addr, &peer_addr_len);
-	        if (fd1 != -1){
-		        retval = getnameinfo((struct sockaddr *) &peer_addr,
-		                        peer_addr_len, host, NI_MAXHOST,
-		                        service, NI_MAXSERV, NI_NUMERICSERV);
-		        if (retval == 0) {
-		            fprintf(stdout, "Received connection from %s:%s\n", host, service);
-		            fflush(stdout);
-		        }
-		        else {
-		            fprintf(stderr, "getnameinfo: %s\n", gai_strerror(retval));
-                    fflush(stderr);
-		        }
-		        if (client_cnt < MAX_CONNECTION) {
-		             cfd[client_cnt++] = fd1; 
-		        }
-		        else{
-		            //close connection
-		            fprintf(stderr, "Max connections reached, drop new connection\n");
-                    fflush(stderr);
-		            close(fd1);
-		        }
-	        }
-	    }
-#warning "List of clients instead of array"	
-	    for(i = 0; i < client_cnt; i++){
-	        ssize_t			bytes;
-#warning "Buffer should be personal for each client, it should be concatinated"	        
-	        char			buf[1000];
-
-	        if (!FD_ISSET(cfd[i], &rfds)) continue;
-	        //data by connection cfd[i]
-	        bytes = read(cfd[i], buf, sizeof(buf));
-	        if (bytes <= 0){
-				    if (bytes < 0){
-		       		    fprintf(stdout, "read error: %s\n", strerror(errno));
-		       		    fflush(stdout);
-				    }
-				    fprintf(stdout, "close connection %d\n", i);
+            peer_addr_len = sizeof(peer_addr);
+            fd1 = accept(fd, (struct sockaddr *) &peer_addr, &peer_addr_len);
+            if (fd1 != -1){
+                retval = getnameinfo((struct sockaddr *) &peer_addr, peer_addr_len, host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICSERV);
+                if (retval == 0) {
+                    fprintf(stdout, "[tcp_server_process]: received connection from %s:%s\n", host, service);
                     fflush(stdout);
-				    close(cfd[i]);
-				    memmove(&cfd[i], &cfd[i + 1], (client_cnt - i - 1) * sizeof(int));
-				    client_cnt--;
-				    i--;
-				    continue;
-	        }
-	        
-	        //working with data 
-	        buf[bytes] = '\0';
-	        fprintf(stdout, "[tcp_process_server]: {connection %d} %s\n", i, buf);
-	        fflush(stdout);
-	        //reply
-	        char *reply = exec_cmd(buf, &exit_flag);
-	        write(cfd[i], reply, strlen(reply));
-	        free(reply);
-	    }
+                }
+                else {
+                    fprintf(stderr, "[tcp_server_process]: getnameinfo error %s\n", gai_strerror(retval));
+                    fflush(stderr);
+                }
+
+                if (connection_add(&srv, fd1) == NULL){
+                    //close connection
+                    fprintf(stderr, "[tcp_server_process]: max connections reached, drop new connection\n");
+                    fflush(stderr);
+                    close(fd1);
+                }
+            }
+        }
+
+        item = list_first_elem(&srv.connection_list);
+        while (!exit_flag && list_is_valid_elem(&srv.connection_list, item)){
+            ssize_t bytes;
+            int remainder;
+            char *endl;
+
+            connection = list_entry(item, struct connection, entry);
+            item = item->next;
+
+            //if (connection->broken) continue;
+            if (!FD_ISSET(connection->fd, &rfds)) continue;
+            //data by connection connection->fd
+            remainder = sizeof(connection->request) - connection->request_used;
+            if (remainder <= 0){
+                //connection_mark_broken(&srv, connection);
+                continue;
+            }
+            bytes = read(connection->fd, connection->request + connection->request_used, remainder);
+            if (bytes <= 0){
+                //connection_mark_broken(&srv, connection);
+                if (bytes < 0){
+                    fprintf(stdout, "[tcp_server_process]: read error %s\n", strerror(errno));
+                    fflush(stdout);
+                }
+                fprintf(stdout, "[tcp_server_process]: close connection %d\n", connection->fd);
+                fflush(stdout);
+                connection_delete(&srv, connection);
+                continue;
+
+            }
+            connection->request_used += bytes;
+            //working with recieved data, find the end of line
+            endl = memchr(connection->request, '\n', connection->request_used);
+            if (endl) {
+                int rc = -1;
+                char reply[MAX_BUFFER_SIZE];
+                *endl = '\0';
+                fprintf(stdout, "[tcp_server_process]: {connection %d} %s\n", connection->fd, connection->request);
+                fflush(stdout);
+                if (reciever == NULL) {
+                    fprintf(stdout, "[tcp_server_process]: we are with the null server reciever\n");
+                    fflush(stdout);
+                    default_server_reciever(connection, &exit_flag);
+                }
+                else { //make something with connection->request
+                    fprintf(stdout, "[tcp_server_process]: we are with the NOT null server reciever\n");
+                    fflush(stdout);
+                    reciever(connection, &exit_flag);
+                }
+                if (sender == NULL) {
+                    fprintf(stdout, "[tcp_server_process]: we are with the null server sender\n");
+                    fflush(stdout);
+                    sprintf(connection->reply, "RE%lx{0:%d,%s,sent ok}\n", strlen(connection->request) + 20 + 2, connection->fd, connection->request);
+                    connection->reply_used = strlen(connection->reply);
+                }
+                else { //make something with connection->reply
+                    fprintf(stdout, "[tcp_server_process]: we are with the NOT null server sender\n");
+                    fflush(stdout);
+                    sender(connection, &exit_flag);
+                }
+                write(connection->fd, connection->reply, strlen(connection->reply));
+                endl++;
+                memmove(connection->request, endl, sizeof(connection->request) - (endl - connection->request));
+                connection->request_used -= (endl - connection->request);
+            }
+       }
     }
     close(fd);
+    server_destroy(&srv);
     return 0;
 }
 
-#if 0
-int tcp_server_with_command_queue_process(char *port) {
-  int listen_sock = 0;
-  int acc_sock = 0;
-  struct sockaddr_in addr;
-  char recv_buf[COMMAND_BUF_LEN];
-  char command_buf[COMMAND_BUF_LEN];
-  char *comm_sep;
-  int rc, recv_pos, comm_len, remainder_len;
-  command_t *new_comm;
-  quit_cond_t *quit_cond;
-  fd_set read_fds;
-  struct timeval tv;
-  int err;
-  int isSocketReuseAddr = 1;
-
-  listen_sock = socket(PF_INET, SOCK_STREAM, 0);
-  if (-1 == listen_sock)
-  {
-    LOGCSER("socket failed\n");
-    return -1;
-  }
-  setcloexec(listen_sock);
-
-  err = setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, (char*)&isSocketReuseAddr, sizeof(isSocketReuseAddr));
-  if (err) {
-      LOGCSER("socket options failed\n");
-      close(listen_sock);
-      return -1;
-  }
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_port = htons(listen_port);
-
-  if (0 != bind(listen_sock, (struct sockaddr *)&addr, sizeof(addr)))
-  {
-    LOGCSER("bind failed\n");
-    close(listen_sock);
-    return -1;
-  }
-
-  if (0 != listen(listen_sock, 1))
-  {
-    LOGCSER("listen failed\n");
-    close(listen_sock);
-    return -1;
-  }
-
-  while (1) {
-    acc_sock = accept(listen_sock, NULL, NULL);
-    if (acc_sock == -1) {
-      /* Non-fatal errors */
-      if ((errno == ECONNABORTED) || (errno == EINTR) ||
-          (errno == EAGAIN) || (errno == EWOULDBLOCK))
-        continue;
-      LOGCSER("accept failed: %s\n", strerror(errno));
-      close(listen_sock);
-      return -1;
-    }
-    setcloexec(acc_sock);
-    break;
-  }
-
-  quit_cond = malloc(sizeof(quit_cond_t));
-  quit_cond_init(quit_cond);
-  if (0 != init_command_server(quit_cond))
-  {
-    LOGCSER("init_command_server failed\n");
-    close(listen_sock);
-    close(acc_sock);
-    quit_cond_destroy(quit_cond);
-    free(quit_cond);
-    quit_cond = NULL;
-    return -1;
-  }
-
-  memset(command_buf, 0, COMMAND_BUF_LEN);
-  recv_pos = 0;
-
-  // Main loop
-  while (1)
-  {
-    // Check quit cond
-    if (quit_cond_check(quit_cond))
-    {
-      LOGCS("quit_cond signalled - quitting\n");
-      break;
-    }
-
-    FD_ZERO(&read_fds);
-    FD_SET(acc_sock, &read_fds);
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-    rc = select(acc_sock + 1, &read_fds, NULL, NULL, &tv);
-    if (0 == rc) // Timeout
-    {
-      continue;
-    }
-    else if (rc < 0)
-    {
-      LOGCSER("Error during select '%d'\n", errno);
-    }
-
-    if (!FD_ISSET(acc_sock, &read_fds))
-    {
-      LOGCSER("acc_sock is not set in read_fds\n");
-      continue;
-    }
-
-#ifdef PRINT_PACKET_INFO
-    LOGCS("recv_pos = %d\n", recv_pos);
-#endif
-    rc = recv(acc_sock, recv_buf + recv_pos, COMMAND_BUF_LEN - recv_pos - 1, MSG_NOSIGNAL|MSG_DONTWAIT);
-    if (rc < 0)
-    {
-      LOGCSER("Error during command recv: %d\n", errno);
-      set_queue_ready();
-      break;
-    }
-    else
-    {
-#ifdef PRINT_PACKET_INFO
-      LOGCS("Received %d bytes\n", rc);
-#endif
-    }
-
-    if (0 == rc)
-    {
-      LOGCS("Connection was closed by client\n");
-      // command_ready should be put on here!!!
-      set_queue_ready();
-      break;
-    }
-
-    recv_pos += rc;
-
-    // Parse accumulated command line
-    while (1)
-    {
-      comm_sep = (char *)strchr(recv_buf, '\n');
-      if (NULL == comm_sep)
-      {
-        LOGCSER("Cannot find end of command, recv_buf = '%s'\n", recv_buf);
-        break;
-      }
-
-      comm_len = comm_sep - recv_buf;
-      remainder_len = recv_pos - comm_len - 1;
-
-      strncpy(command_buf, recv_buf, comm_len);
-      command_buf[comm_len] = '\0';
-
-      memmove(recv_buf, recv_buf + comm_len + 1, remainder_len);
-      memset(recv_buf + remainder_len, 0, COMMAND_BUF_LEN - remainder_len);
-      recv_pos = remainder_len;
-
-      // Create command and add into queue
-      new_comm = (command_t *)malloc(sizeof(command_t));
-
-      memset(new_comm, 0, sizeof(command_t));
-      strncpy(new_comm->full_command, command_buf, comm_len);
-      new_comm->client_sock = acc_sock;
-#ifdef PRINT_PACKET_INFO
-      LOGCS("Queuing new command: '%s'\n", new_comm->full_command);
-#endif
-      add_command(new_comm);
-      if (*recv_buf == '\0')
-        break;
-    }
-  }
-  close(acc_sock);
-  close(listen_sock);
-  stop_command_server();
-  quit_cond_destroy(quit_cond);
-  free(quit_cond);
-
-  return 0;
+const char *default_client_sender(struct connection *connection, int *exit_flag) { 
+    fprintf(stdout, "[default_client_sender]: we are IN the client sender\n");
+    fflush(stdout);
+    if (!connection) connection = connection_add(NULL, 0);
+    (void)exit_flag;
+    fprintf(stdout, "[default_client_sender]$ ");
+    fflush(stdout);
+    scanf("%[^\n]%*c", connection->request);
+    strcat(connection->request, "\n");
+    return connection->request;
 }
 
-#endif
+const char *default_client_reciever(struct connection *connection, int *exit_flag) {
+    fprintf(stdout, "[default_client_reciever]: we are IN the client reciever\n");
+    fflush(stdout);
+    if (!connection) return NULL;
+    fprintf(stdout, "[default_client_reciever]: %s\n", connection->reply);
+    fflush(stdout);
+    return (char*)connection->reply;
+}
 
-int tcp_client_process(char* addr, char *port){
-    int			fd;
-    struct addrinfo	hints;
-    struct addrinfo	*result, *rp;
-    int			rc;
+int tcp_client_process(char* addr, char *port, char *(*reciever) (struct connection *, int *exit_flag), char *(*sender) (struct connection *, int *exit_flag)){
+    int fd;
+    struct addrinfo hints;
+    struct addrinfo *result, *rp;
+    int rc;
+    int exit_flag;
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;     //IPv4 && IPv6
@@ -402,186 +368,94 @@ int tcp_client_process(char* addr, char *port){
 
     rc = getaddrinfo(addr, port, &hints, &result);
     if (rc != 0) {
-			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
-			exit(EXIT_FAILURE);
+        fprintf(stderr, "[tcp_client_process]: getaddrinfo error %s\n", gai_strerror(rc));
+        fflush(stderr);
+        exit(EXIT_FAILURE);
     }
 
     for (rp = result; rp != NULL; rp = rp->ai_next) {
-			fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-			if (fd == -1) continue;
-			if (connect(fd, rp->ai_addr, rp->ai_addrlen) != -1) break;
-			close(fd);
+        fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (fd == -1) continue;
+        if (connect(fd, rp->ai_addr, rp->ai_addrlen) != -1) break;
+        close(fd);
     }
 
-   	if (rp == NULL) {
-			fprintf(stderr, "Could not connect\n");
-			exit(EXIT_FAILURE);
+    if (rp == NULL) {
+        fprintf(stderr, "[tcp_client_process]: could not connect\n");
+        fflush(stderr);
+        exit(EXIT_FAILURE);
     }
 
     freeaddrinfo(result);
 
-    while(1){
-		ssize_t	rc = 0;
-        char cmd[MESSAGE_LEN];
-		char reply[MESSAGE_LEN];
+    struct connection *connection = connection_add(NULL, fd);
+    while(!exit_flag){
+        ssize_t bytes;
+        int remainder;
+        char *endl;
 
-		strcpy(cmd, getRequest());
+        if (sender == NULL) sender = default_client_sender;
+        sender(connection, &exit_flag);
 
-		rc = write(fd, cmd, strlen(cmd));
-		if (rc != strlen(cmd)) {
-	        if (rc < 0) {
-	            printf("write error: %s\n", strerror(errno));
-	        }
-	        break;
-		}
-		char s[80];
-	    rc = read(fd, s, sizeof(s) - 1);
-	    if (rc <= 0) {
-	       	if (rc < 0) {
-	       	    printf("read error: %s\n", strerror(errno));
-	       	}
-	       	break;
-		}
-		s[rc] = '\0';
+        bytes = write(connection->fd, connection->request, strlen(connection->request));
+        if (bytes != strlen(connection->request)) {
+            if (bytes < 0) {
+                fprintf(stderr, "[tcp_client_process]: write error %s\n", strerror(errno));
+                fflush(stderr);
+            }
+            break;
+        }
 
-		if (checkReply(s) < 0) {
-		    strcpy(reply, "no answer");
-		}
-		else {
-		    strcpy(reply, s);
-		}
-
-		printf("server reply: %s\n", reply);
+        remainder = sizeof(connection->reply) - connection->reply_used;
+        if (remainder <= 0){
+            //TODO:
+            fprintf(stderr, "[tcp_client_process]: reply_used %ld more then reply length %ld\n", connection->reply_used, sizeof(connection->reply));
+            fflush(stderr);
+            continue;
+        }
+        bytes = read(connection->fd, connection->reply + connection->reply_used, remainder);
+        if (bytes <= 0){
+            fprintf(stdout, "[tcp_client_process]: read error %s\n", strerror(errno));
+            fflush(stdout);
+            exit_flag = 1;
+            break;
+        }
+        connection->reply_used += bytes;
+        endl = memchr(connection->reply, '\n', connection->reply_used);
+        if (endl) {
+            *endl = '\0';
+        }
+        else {
+            fprintf(stdout, "[tcp_client_process]: %s may be not full reply\n", connection->reply);
+            fflush(stdout);
+        }
+        fprintf(stdout, "[tcp_client_process]: current reply buffer is %s\n", connection->reply);
+        fflush(stdout);
+        //working with recieved data, find the end of line
+        if (reciever == NULL) {
+            fprintf(stdout, "[tcp_client_process]: we are with the null client reciever\n");
+            fflush(stdout);
+            default_client_reciever(connection, &exit_flag);
+        }
+        else { //make something with connection->request
+            fprintf(stdout, "[tcp_client_process]: we are with the NOT null client reciever\n");
+            fflush(stdout);
+            int rc = reciever(connection, &exit_flag);
+            if (rc == -1) {
+                //TODO:
+                //connection_mark_broken(&srv, connection);
+                continue;
+            }
+        }
+        endl++;
+        memmove(connection->reply, endl, sizeof(connection->reply) - (endl - connection->reply));
+        connection->reply_used -= (endl - connection->reply);
     }
-
+    free(connection);
     close(fd);
     return EXIT_SUCCESS;
 }
 
-int tcp_client_with_select_process(char* addr, char *port) {
-
-  int fd, rc = 0;
-
-  char buf[MESSAGE_LEN];
-  int isQuiting = 0;
-  long mode = 0;
-  fd_set read_fds;
-  struct timeval tv;
-
-#if 0
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;     //IPv4
-    addr.sin_addr.s_addr = inet_addr(addr);
-    addr.sin_port = htons(program_opts.port);
-
-    if (0 != connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
-        printf("connect failed\n");
-        close(sock);
-        return EXIT_FAILURE;
-    }
-#else
-    struct addrinfo	hints;
-    struct addrinfo	*result, *rp;
-    
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_UNSPEC;     // Allow IPv4 or IPv6
-    hints.ai_socktype = SOCK_STREAM; // TCP socket
-    hints.ai_flags = 0;
-    hints.ai_protocol = 0;           // any protocol
-
-    rc = getaddrinfo(addr, port, &hints, &result);
-    if (rc != 0) {
-			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
-			exit(EXIT_FAILURE);
-    }
-
-    for (rp = result; rp != NULL; rp = rp->ai_next) {
-			fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-			if (fd == -1) continue;
-			if (connect(fd, rp->ai_addr, rp->ai_addrlen) != -1) break;
-			close(fd);
-    }
-
-   	if (rp == NULL) {
-			fprintf(stderr, "Could not connect\n");
-			exit(EXIT_FAILURE);
-    }
-
-    freeaddrinfo(result);
-#endif
-
-  while (!isQuiting) {
-    printf("\nEnter command: ");
-    if (!fgets(buf, MESSAGE_LEN, stdin)) {
-      continue;
-    }
-
-    if (buf[0] == '\n')
-      continue;
-
-    if (buf[strlen(buf) - 1] != '\n') {
-      printf("\nERROR: invalid command.\n");
-
-      fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
-      while (getchar() != -1);
-      mode = fcntl(STDIN_FILENO, F_GETFL);
-      fcntl(STDIN_FILENO, F_SETFL, mode & ~O_NONBLOCK);
-
-      continue;
-    }
-
-    if (buf[0] == '_')
-        break;
-
-    if (!strcasecmp(buf, "QUIT\n") || !strcasecmp(buf, "Q\n"))
-      isQuiting = 1;
-
-    rc = send(fd, buf, strlen(buf), 0);
-    if (rc < 0)
-      printf("Sending failed, errno = %d\n", errno);
-    else
-      printf("Command successfully sent\n");
-
-    rc = 0;
-    while (!rc) {
-      FD_ZERO(&read_fds);
-      FD_SET(fd, &read_fds);
-      tv.tv_sec = 1;
-      tv.tv_usec = 0;
-      rc = select(fd + 1, &read_fds, NULL, NULL, &tv);
-      if (rc < 0) {
-        printf("[tcp_client_process]: select failed while waiting for reply: %s\n", strerror(errno));
-        continue;
-      } 
-      else {
-        printf("Waiting for reply...\n");
-        continue;
-      }
-      if (!FD_ISSET(fd, &read_fds))
-        continue;
-    }
-
-#warning "Buffer shoud be concatinated"    
-    rc = recv(fd, buf, MESSAGE_LEN - 1, MSG_NOSIGNAL|MSG_DONTWAIT);
-    if (rc < 0) {
-      printf("Recv failed: %s\n", strerror(errno));
-      continue;
-    } 
-    else if (rc > 0) {
-      printf("Reply received, rc = %d\n", rc);
-      buf[rc] = '\0';
-    } 
-    else {
-      printf("Connection closed by server\n");
-      break;
-    }
-    printf("Reply: %s\n", buf);
-  }
-
-  close(fd);
-
-  return EXIT_SUCCESS;
-}
 
 
 
