@@ -5,42 +5,24 @@
 #include <locale.h>
 #include <pthread.h>
 
-#include "pmngr/signal_reaction.h"
-#include "shmem/shared_memory.h"
-#include "pmngr/process_mngr.h"
-
 #include "tcp/tcp_process.h"
 #include "command_server/command_server.h"
-#include "model/model.h"
 
-
-void usage(char *pname) {
-    fprintf(stderr, "Usage: %s /shmpath\n", pname);
-}
-
-struct manager_params {
-    char shmpath[256];
-    char port[8]; 
-    int process_cnt;
-    int data_cnt; 
-    size_t data_size;
-};
-
-struct manager_params *parse_command_line(int argc, char *argv[]){
 #if 0
-    if (argc < 2) {
-        usage(argv[0]);
-        exit(EXIT_FAILURE);
-    }
+
+void takeCommand(command_t *cmd, int *exit_flag, void (*callback)(command_t *)) {
+    (void)callback;
+#if 1
+    //this function
+    defaultExecuteCommand(cmd, exit_flag, defaultSendReply);
+    //executeSimpleCommand(cmd, exit_flag);
+#else
+    //parse commands and execute it with defaultSendReply or your own callback
+    //if more then one action, please, group it executors to this function
+    executeAPICommand(cmd, exit_flag, defaultSendReply);
 #endif
-    struct manager_params *mngr = malloc(sizeof(struct manager_params));
-    strcpy(mngr->shmpath, "/modelshm");
-    strcpy(mngr->port, "4444");
-    mngr->process_cnt = 3;
-    mngr->data_cnt = 512;
-    mngr->data_size = 1024;
-    return mngr;
 }
+#endif
 
 //think about *exit_flag = -1/0/1 with -1 at start, 0 on init() and 1 on stop()
 char *putCommand(struct connection *connection, int *exit_flag) {
@@ -70,29 +52,10 @@ char *putCommand(struct connection *connection, int *exit_flag) {
 int main(int argc, char *argv[]) {
     int exit_flag = 0;
 
-#if 0
-    struct manager_params *mngr = parse_command_line(argc, argv);
-
-    //backtrace for exception
-    setlocale(LC_ALL, "");
-    set_signal_reactions();
-    signal_thread_init(&exit_flag);
-#endif
-
     struct command_server *cmdsrv = command_server_init(&exit_flag);
     if (cmdsrv != NULL) {
-        //tcp_server_process(mngr->port, putCommand, 0);
         tcp_server_process(argv[1], putCommand, 0);
         command_server_destroy(cmdsrv);
     }
-
-#if 0
-    signal_thread_destroy();
-
-    free(mngr);
-#endif
-
     return 0;
 }
-
-

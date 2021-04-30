@@ -1,0 +1,22 @@
+{
+    "modules": [
+        "server",
+error
+        }
+    },
+    "capturer": {
+        "id": 1,
+        "name": "capturer",
+        "parameters": [],
+        "type": "MIDDLE",
+        "next_id": 2
+    },
+    "filter": {
+        "id": 2,
+        "name": "filter",
+        "parameters": [],
+        "type": "LAST",
+        "next_id": 0
+    }
+}
+
