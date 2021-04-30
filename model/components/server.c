@@ -35,7 +35,7 @@ struct manager_params *parse_command_line(int argc, char *argv[]){
 #endif
     struct manager_params *mngr = malloc(sizeof(struct manager_params));
     strcpy(mngr->shmpath, "/modelshm");
-    strcpy(mngr->port, "4444");
+    strcpy(mngr->port, argv[1]);
     mngr->process_cnt = 3;
     mngr->data_cnt = 512;
     mngr->data_size = 1024;

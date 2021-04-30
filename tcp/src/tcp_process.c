@@ -131,6 +131,7 @@ int connection_restart(struct server *srv, struct connection *connection){
 }
 #endif
 
+//ATTENTION: memory for server should be allocated before init
 int server_init(struct server *srv){
     memset(srv, 0, sizeof(struct server));
     //srv->state = SERVER_STOPPED;

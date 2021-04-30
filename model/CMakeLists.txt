@@ -34,7 +34,6 @@ include_directories(${CMAKE_SOURCE_DIR}/../pmngr/include)
 include_directories(${CMAKE_SOURCE_DIR}/../config/include)
 include_directories(${CMAKE_SOURCE_DIR}/../command_server/include)
 
-
 add_library(${PROJECT_NAME} SHARED
     #header
     include/model/model.h
