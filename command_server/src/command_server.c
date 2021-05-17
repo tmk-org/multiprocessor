@@ -7,11 +7,13 @@
 
 #include "misc/ring_buffer.h"
 #include "command_server/command_server.h"
-#include "model/model.h"
+//#include "model/model.h"
+#include "pipeline/pipeline.h"
 
 //#include "api/api.h"
 
-static struct model_desc *mdesc = NULL;
+//static struct model_desc *mdesc = NULL;
+static struct pipeline *pdesc = NULL;
 
 static struct ring_buffer *cmd_ring = NULL;
 
@@ -26,15 +28,18 @@ int executeAPICommand(const char *cmd, int *exit_flag) {
         fprintf(stdout, "[command_server]: STOP command recieved\n");
         fflush(stdout);
         *exit_flag = 1;
-        if (mdesc) model_destroy(mdesc);
-        mdesc= NULL;
+        //if (mdesc) model_destroy(mdesc);
+        //mdesc= NULL;
+        if (pdesc) pipeline_destroy(pdesc);
     }
     else if (strcasecmp(cmd, "INIT\n") == 0 || strcasecmp(cmd, "I\n") == 0 ||
              strcasecmp(cmd, "INIT") == 0 || strcasecmp(cmd, "I") == 0 ) { 
         fprintf(stdout, "[command_server]: INIT command recieved\n");
         fflush(stdout);
-        mdesc = model_init(NULL);
-        if (mdesc == NULL) {
+        //mdesc = model_init(NULL);
+        //if (mdesc == NULL) {
+        pdesc = pipeline_init(NULL);
+        if (pdesc == NULL) {
             fprintf(stdout, "[command_server]: command '%s' failed\n", cmd);
             fflush(stdout);
         }
@@ -49,8 +54,10 @@ int executeAPICommand(const char *cmd, int *exit_flag) {
         //TODO: use api which can support parameters as filename with the path
         fprintf(stdout, "[command_server]: input model configuration filename\n");        
         scanf("%s", fname);
-        mdesc = model_init(fname);
-        if (mdesc == NULL) {
+        pdesc = pipeline_init(NULL);
+        if (pdesc ==NULL) {
+        //mdesc = model_init(fname);
+        //if (mdesc == NULL) {
             fprintf(stdout, "[command_server]: command '%s' failed\n", cmd);
             fflush(stdout);
         }
@@ -60,7 +67,7 @@ int executeAPICommand(const char *cmd, int *exit_flag) {
             fprintf(stdout, "[command_server]: starting model from %s...\n", cmd, fname);
             fflush(stdout);
         }
-    } 
+    }
     else {
         fprintf(stdout, "[command_server]: Received unknown command '%s'\n", cmd);
         fflush(stdout);

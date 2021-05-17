@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.17)
 
-set(PROJECT_NAME "cmdsrv")
+set(PROJECT_NAME "pipeline")
 
 project(${PROJECT_NAME}
-    DESCRIPTION "Network communication text-based command api"
-    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/api"
+    DESCRIPTION "Pipeline example"
+    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/pipeline"
     LANGUAGES C CXX)
 
 ###############################################################################
@@ -26,37 +26,43 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 ###############################################################################
 
 #include(GenerateVersion)
-include_directories(${CMAKE_SOURCE_DIR}/../tcp/include)
+
 include_directories(${CMAKE_SOURCE_DIR}/../misc/include)
-#include_directories(${CMAKE_SOURCE_DIR}/../model/include)
-include_directories(${CMAKE_SOURCE_DIR}/../pipeline/include)
+include_directories(${CMAKE_SOURCE_DIR}/../shmem/include)
+include_directories(${CMAKE_SOURCE_DIR}/../tcp/include)
+include_directories(${CMAKE_SOURCE_DIR}/../pmngr/include)
+include_directories(${CMAKE_SOURCE_DIR}/../config/include)
+include_directories(${CMAKE_SOURCE_DIR}/../command_server/include)
 
 add_library(${PROJECT_NAME} SHARED
-    #headers
-    include/command_server/command_server.h
+    #header
+    include/pipeline/pipeline.h
     #sources
-    src/command_server.c
-)
-target_link_libraries(${PROJECT_NAME} pipeline misc)
-
-set(${PROJECT_NAME}_PUBLIC_HEADERS
-    include/command_server/command_server.h
+    src/pipeline_server.c
+    src/pipeline_client.c
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES 
-    PUBLIC_HEADER "{${PROJECT_NAME}_PUBLIC_HEADERS}"
-)
+target_link_libraries(${PROJECT_NAME} misc shmem pmngr tcp config)
 
 target_include_directories (${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
-add_executable(cclient examples/client.c)
-target_link_libraries(cclient tcp)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -g")
+set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -g")
 
-add_executable(cserver examples/server.c)
-target_link_libraries(cserver tcp ${PROJECT_NAME} -pthread)
+add_executable(pfirst components/first.c)
+target_link_libraries(pfirst ${PROJECT_NAME} shmem pmngr pipeline)
+
+add_executable(pmiddle components/middle.c)
+target_link_libraries(pmiddle ${PROJECT_NAME} shmem pmngr pipeline)
+
+add_executable(pserver components/server.c)
+target_link_libraries(pserver ${PROJECT_NAME} shmem pmngr pipeline tcp cmdsrv)
+
+add_executable(pmanager components/manager.c)
+target_link_libraries(pmanager tcp)
 
 ###############################################################################
 # Tests
@@ -69,17 +75,17 @@ include_directories(${GTEST_INCLUDE_DIR})
 set(PROJECT_TESTS ${PROJECT_NAME}-tests)
 
 #add_executable(${PROJECT_TESTS}
-#    tests/ApiTests.cpp
+#    tests/ModelTests.cpp
 #)
 
 #add_executable(${PROJECT_TESTS}
-#    tests/api_tests.c
+#    tests/model_tests.c
 #)
 
 #target_link_libraries(${PROJECT_TESTS}
-#    ${GTEST_BOTH_LIBRARIES} pthread
+#    ${GTEST_BOTH_LIBRARIES} pthread rt
 #    ${PROJECT_NAME}
 #)
 
 #add_test(${PROJECT_TESTS} ${PROJECT_TESTS})
-#add_test(NAME ${PROJECT_TESTS} COMMAND $<TARGET_FILE:${PROJECT_TESTS}>)
+#add_test(NAME ${PROJECT_TESTS} COMMAND $<TARGET_FILE:${PROJECT_TESTS}>
