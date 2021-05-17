@@ -72,7 +72,7 @@ int pipeline_process(void (*pipeline_action) (void *data, int *status)) {
                 fprintf(stdout, "[%s]: %s\n", proc_info->process_name, data);
                 fflush(stdout);
                 if (pipeline_action) {
-                    pipeline_action((void*)(&data), &status);
+                    pipeline_action((void*)data, &status);
                     fprintf(stdout, "[%s]: pipeline_action finished with status %d\n", proc_info->process_name, status);
                     fflush(stdout);
                     if (status == -1) {
