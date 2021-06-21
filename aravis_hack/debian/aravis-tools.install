@@ -1,0 +1,5 @@
+usr/bin/arv-viewer-*
+usr/share/man/man1/arv-viewer-*
+usr/share/metainfo/arv-viewer-*.appdata.xml
+usr/share/icons/
+usr/share/locale/

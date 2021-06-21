@@ -1,0 +1,83 @@
+diff --git a/src/arvgvstream.c b/src/arvgvstream.c
+index 595fbe5..1574f35 100644
+--- a/src/arvgvstream.c
++++ b/src/arvgvstream.c
+@@ -42,6 +42,14 @@
+ #include <stdio.h>
+ #include <errno.h>
+ 
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/time.h>
++#include <fcntl.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdint.h>
++
+ #if ARAVIS_HAS_PACKET_SOCKET
+ #include <ifaddrs.h>
+ #include <netinet/udp.h>
+@@ -64,6 +72,12 @@
+ 
+ #define ARV_GV_STREAM_DISCARD_LATE_FRAME_THRESHOLD	100
+ 
++struct log_hdr{
++	char		signature_1[8];
++	uint64_t	pkt_size;
++	char		signature_2[8];
++};
++
+ enum {
+ 	ARV_GV_STREAM_PROPERTY_0,
+ 	ARV_GV_STREAM_PROPERTY_SOCKET_BUFFER,
+@@ -794,9 +808,50 @@ _loop (ArvGvStreamThreadData *thread_data)
+ 			time_us = g_get_monotonic_time ();
+ 
+ 			if (poll_fd[0].revents != 0) {
++				static int fd = -1;
++				static char log_file[200];
++
++				if (fd == -1){
++					struct timeval	tv;
++					struct tm	tm;
++
++					gettimeofday(&tv, NULL);
++					localtime_r(&tv.tv_sec, &tm);
++					snprintf(log_file, sizeof(log_file), "/tmp/aravis_capture_%04d-%02d-%02d_%02d:%02d:%02d.%09ld.dump",
++					         1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, tv.tv_usec);
++
++					fd = open(log_file, O_WRONLY | O_CREAT | O_TRUNC, 0664);
++					if (fd == -1){
++						dprintf(fileno(stderr), "ERROR: can't create log file %s, error: %s\n", log_file, strerror(errno));
++					}
++				}
++
+ 				read_count = g_socket_receive (thread_data->socket, (char *) packet,
+ 							       ARV_GV_STREAM_INCOMING_BUFFER_SIZE, NULL, NULL);
+ 
++				if (fd >= 0){
++					ssize_t		ret;
++					struct log_hdr	hdr;
++
++					memcpy(hdr.signature_1, "**sig**\n", sizeof(hdr.signature_1));
++					memcpy(hdr.signature_2, "**gis**\n", sizeof(hdr.signature_2));
++					hdr.pkt_size = read_count;
++
++					ret = write(fd, &hdr, sizeof(hdr));
++					if (ret != sizeof(hdr)){
++						dprintf(fileno(stderr), "ERROR: can't write log file %s\n", log_file);
++						close(fd);
++						fd = -2;
++					} else {
++						ssize_t ret = write(fd, packet, read_count);
++						if (ret != read_count){
++							dprintf(fileno(stderr), "ERROR: can't write log file %s\n", log_file);
++							close(fd);
++							fd = -2;
++						}
++					}
++				}
++
+ 				frame = _process_packet (thread_data, packet, read_count, time_us);
+ 			} else
+ 				frame = NULL;

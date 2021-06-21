@@ -1,0 +1,71 @@
+aravis (1:0.8.6-1) unstable; urgency=low
+
+  * HACK for take stream
+
+ -- Kat <kat@gmail.com>  Sun, 20 Jun 2021 04:51:45 +0000
+
+aravis (0.8.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <marmochiaskl@gmail.com>  Sun, 14 Feb 2021 04:51:45 +0000
+
+aravis (0.8.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <marmochiaskl@gmail.com>  Wed, 9 Dec 2020 14:29:17 +0000
+
+aravis (0.8.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <marmochiaskl@gmail.com>  Sun, 26 Nov 2020 12:24:13 +0000
+
+aravis (0.8.2-1) unstable; urgency=low
+
+  * New upstream release. Watch the official gnome repository (Closes: #973777)
+
+ -- Chiara Marmo <marmochiaskl@gmail.com>  Sun, 22 Nov 2020 17:24:13 +0000
+
+aravis (0.8.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <marmochiaskl@gmail.com>  Sat, 31 Oct 2020 06:56:02 +0000
+
+aravis (0.7.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <marmochiaskl@gmail.com>  Mon, 01 Jun 2020 20:47:35 +0000
+
+aravis (0.6.0-3) unstable; urgency=low
+
+  * Fix missing dependencies for libaravis-dev (Closes: #945533)
+
+ -- Chiara Marmo <chiara.marmo@u-psud.fr>  Tue, 26 Nov 2019 20:41:28 +0000
+
+aravis (0.6.0-2) unstable; urgency=low
+
+  * Fix missing file arv-viewer.ui. (Closes: #922823)
+
+ -- Chiara Marmo <chiara.marmo@u-psud.fr>  Fri, 01 Mar 2019 21:07:12 +0200
+
+aravis (0.6.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <chiara.marmo@u-psud.fr>  Tue, 06 Nov 2018 13:33:34 +0200
+
+aravis (0.5.12-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chiara Marmo <chiara.marmo@u-psud.fr>  Tue, 08 May 2018 11:22:58 +0200
+
+aravis (0.5.11-1) unstable; urgency=low
+
+  * Initial release. (Closes: #843185)
+
+ -- Chiara Marmo <chiara.marmo@u-psud.fr>  Wed, 07 Mar 2018 20:59:23 +0200

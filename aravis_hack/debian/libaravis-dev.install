@@ -1,0 +1,5 @@
+usr/lib/*/libaravis-*.so
+usr/include/
+usr/lib/*/pkgconfig/
+usr/share/gir-1.0/
+
