@@ -20,6 +20,13 @@ static void set_cancel(int signal) {
     cancel = 1;
 }
 
+/***********************************************
+ /sbin/ifconfig enp1s0::2 169.254.2.100/24 up
+ /sbin/ifconfig enp1s0::3 169.254.3.100/24 up
+ 
+ bin/arvclient 169.254.2.100
+***********************************************/
+
 struct data_generator *generator_init(char *interface, char *serial){
     struct data_generator *generator = (struct data_generator *)malloc(sizeof(struct data_generator));
     generator->curr = -1;

@@ -95,7 +95,8 @@ static void new_buffer_cb(ArvStream *stream, ApplicationData *data) {
                     frames_non_cnt++;
                 }
 #else
-    sem_post(&(data->collector)->data_ready);
+    if (id % 100 == 0)
+        sem_post(&(data->collector)->data_ready);
 #endif
 //-------------------------------------------------------------------------------------
             sprintf(name, "../data/test_%d.bmp", id++);
@@ -111,6 +112,7 @@ static gboolean periodic_task_cb (void *abstract_data) {
     ApplicationData *data = (ApplicationData *)abstract_data;
 
     fprintf(stdout, "Frame rate = %d Hz\n", data->buffer_count);
+    fflush(stdout);
     data->buffer_count = 0;
 
     if (cancel) {
@@ -142,6 +144,7 @@ struct data_collector *collector_init(char* source) {
     
     if (sem_init(&(collector->data_ready), 1, 0) == -1) {
         fprintf(stderr, "[cvcollector]: can't init object collector semaphore\n");
+        fflush(stderr);
         return NULL;
     }
 

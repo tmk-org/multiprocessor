@@ -82,7 +82,11 @@ add_executable(arvserver tools/arvserver.cpp)
 target_link_libraries(arvserver ${PROJECT_NAME})
 
 add_executable(arvclient tools/arvclient.cpp)
-target_link_libraries(arvclient ${PROJECT_NAME} -pthread)
+target_link_libraries(arvclient ${PROJECT_NAME})
+target_include_directories(arvclient PUBLIC "/usr/include/aravis-0.8")
+target_include_directories(arvclient PUBLIC "/usr/include/glib-2.0/")
+target_include_directories(arvclient PUBLIC "/usr/lib/x86_64-linux-gnu/glib-2.0/include")
+target_link_libraries(arvclient -pthread aravis glib-2.0 gobject-2.0 opencv_core opencv_highgui)
 
 ###############################################################################
 # Tests
