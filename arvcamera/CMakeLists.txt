@@ -66,7 +66,7 @@ target_include_directories (${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-add_executable(arvsource examples/arvcamera.cpp)
+add_executable(arvsource examples/arvsource.cpp)
 target_include_directories(arvsource PUBLIC "/usr/include/aravis-0.8")
 target_include_directories(arvsource PUBLIC "/usr/include/glib-2.0/")
 target_include_directories(arvsource PUBLIC "/usr/lib/x86_64-linux-gnu/glib-2.0/include")
