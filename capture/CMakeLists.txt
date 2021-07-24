@@ -66,6 +66,8 @@ target_include_directories (${PROJECT_NAME} PUBLIC
 add_executable(finddevices tools/finddevices.c)
 target_link_libraries(finddevices ${PROJECT_NAME})
 
+add_executable(udpcapture tools/capture.c)
+target_link_libraries(udpcapture ${PROJECT_NAME} -pthread)
 
 ###############################################################################
 # Tests

@@ -74,6 +74,9 @@
 #define GVSP_PACKET_INFO_CONTENT_TYPE_POS   24
 
 //register addresses
+#define GV_GVCP_CAPABILITY_OFFSET               0x00000934
+
+
 #define GV_REGISTER_N_STREAM_CHANNELS_OFFSET    0x00000904
 
 #define GV_HEARTBEAT_TIMEOUT_OFFSET             0x00000938
@@ -84,6 +87,7 @@
 #define GV_STREAM_CHANNEL_0_IP_ADDRESS_OFFSET   0x00000d18
 #define GV_STREAM_CHANNEL_0_PORT_OFFSET         0x00000d00
 #define GV_STREAM_CHANNEL_0_PACKET_SIZE_OFFSET  0x00000d04
+#define GV_STREAM_CHANNEL_SOURCE_PORT_OFFSET    0x00000d1c
 
 #define GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET     0x00000a00
 
@@ -274,11 +278,11 @@ int gvsp_packet_type_is_error(const enum gvcp_packet_type packet_type) {
 }
 
 enum gvsp_packet_type gvsp_packet_get_packet_type(const struct gvsp_packet *packet) {
-    return (enum gvsp_packet_type)ntohs(packet->packet_type);
+    return (const enum gvsp_packet_type)ntohs(packet->packet_type);
 }
 
 int gvsp_packet_has_extended_ids(const struct gvsp_packet *packet) {
-    return ((char*)(packet->header[2] & GVSP_PACKET_EXTENDED_ID_MODE_MASK) != 0);
+    return ((packet->header[2] & GVSP_PACKET_EXTENDED_ID_MODE_MASK) != 0);
 }
 
 enum gvsp_content_type gvsp_packet_get_content_type(const struct gvsp_packet *packet) {
@@ -599,12 +603,11 @@ struct gvcp_packet *listen_packet_ack(int fd) {
     int rc = 0;
     ssize_t bytes = 0;
     struct timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 500000;
     while (1) {
         FD_ZERO(&readfd);
         FD_SET(fd, &readfd);
-        //memset(&tv, 0, sizeof(struct timeval));
+        tv.tv_sec = 0;
+        tv.tv_usec = 500000;
         rc = select(fd + 1, &readfd, NULL, NULL, &tv);
         if (rc > 0) {
             if (FD_ISSET(fd, &readfd)) {
@@ -687,18 +690,14 @@ void* source_data_thread_udp(void *arg) {
     int rc = 0;
     ssize_t bytes = 0;
     struct timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 500000;
-    
+
     struct frame_data *frame = (struct frame_data*)malloc(sizeof(struct frame_data));
     frame->is_started = 0;
 
-    fprintf(stdout, "[0] Hello from source_data_thread_udp, fd = %d\n", fd);
-    fflush(stdout);
+    //fprintf(stdout, "[0] Hello from source_data_thread_udp, fd = %d\n", fd);
+    //fflush(stdout);
 
     uint32_t packet_size = src->packet_size - IP_HEADER_SIZE - UDP_HEADER_SIZE;
-    uint32_t value = -1;
-
     struct gvsp_packet *packet = (struct gvsp_packet*)malloc(packet_size);
 
     while (!src->exit_flag) {
@@ -706,7 +705,8 @@ void* source_data_thread_udp(void *arg) {
         //fflush(stdout);
         FD_ZERO(&readfd);
         FD_SET(fd, &readfd);
-        memset(&tv, 0, sizeof(struct timeval));
+        tv.tv_sec = 0;
+        tv.tv_usec = 500000;
         rc = select(fd + 1, &readfd, NULL, NULL, &tv);
         if (rc > 0) {
             if (FD_ISSET(fd, &readfd)) {
@@ -718,6 +718,7 @@ void* source_data_thread_udp(void *arg) {
                 if (bytes < 0) {
                     fprintf(stdout, "[source_data_thread_udp]: no data on inteface\n");
                     fflush(stdout);
+                    free(packet);
                     return NULL;
                 }
                 //work with packet
@@ -735,7 +736,7 @@ void* source_data_thread_udp(void *arg) {
                     if (frame->is_started) {
                         char fname[50];
                         sprintf(fname, "data/out_%ld.raw", last_frame_id);
-                        fprintf(stdout, "Out frame to %s\n", fname);
+                        fprintf(stdout, "Out frame to %s as binary\n", fname);
                         int out_fd;
                         out_fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0664);
                         if (out_fd > 0) {
@@ -801,14 +802,35 @@ void* source_data_thread_udp(void *arg) {
                                 break;
                             }
                             case GVSP_CONTENT_TYPE_DATA_BLOCK: {
+#if 0
+                                size_t block_size;
+                                ptrdiff_t block_offset;
+                                ptrdiff_t block_end;
+                                size_t block_header = sizeof(struct gvsp_packet) + sizeof(struct gvsp_header);
+                                block_size = gvsp_packet_get_data_size(packet, packet_size);
+                                block_offset = (packet_id - 1) * (packet_size - block_header);
+                                block_end = block_size + block_offset;
+                                //TODO: block_end vs buffer_size
+                                memcpy(frame->buffer + frame->real_size, gvsp_packet_get_data(packet), block_size);
+                                frame->real_size += block_size;
+#else
                                 //process data block -- update this place without copy memory
                                 memcpy(frame->buffer + frame->real_size, gvsp_packet_get_data(packet), gvsp_packet_get_data_size(packet, packet_size));
                                 frame->real_size += gvsp_packet_get_data_size(packet, packet_size);
+#endif
                                 //fprintf(stdout, "frame->real_size = %zd\n", frame->real_size);
                                 //fflush(stdout);
                                 break;
                             }
                             case GVSP_CONTENT_TYPE_DATA_TRAILER:
+                                if (frame->error_packet_recieved == 1) {
+                                    fprintf(stdout, "1 ");
+                                }
+                                else {
+                                    fprintf(stdout, "0 ");
+                                }
+                                fprintf(stdout, "frame->real_size = %zd\n", frame->real_size);
+                                fflush(stdout);
                                 //process data trailer
                                 break;
                             default:
@@ -920,6 +942,7 @@ int connect_to_device(struct device *dev) {
 
     //Read a number of stream channels register from the camera socket
     read_register(fd, GV_REGISTER_N_STREAM_CHANNELS_OFFSET, &value, packet_id);
+    read_register(fd, GV_GVCP_CAPABILITY_OFFSET, &value, next_packet_id(packet_id));
 
     //Read camera parameters
     uint32_t timestamp_tick_frequency_high;
@@ -936,17 +959,37 @@ int connect_to_device(struct device *dev) {
     write_register(fd, GV_STREAM_CHANNEL_0_PORT_OFFSET, port, next_packet_id(packet_id));
     read_register(fd, GV_STREAM_CHANNEL_0_PACKET_SIZE_OFFSET, &src->packet_size, next_packet_id(packet_id));
 
-    //Start source
-    //pthread_create(&thread_id, NULL, source_data_thread_udp, src);
-    //fprintf(stdout, "Data thread created on fd = %d\n", src->fd);
-    //fflush(stdout);
-
-#if 1
-    write_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, 0x02, next_packet_id(packet_id));
     //Start aquistion
+    write_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, 0x02, next_packet_id(packet_id));
+#if 0
     write_register(fd, 0x124, 0x01, next_packet_id(packet_id));
-    //write_register(fd, 0xF0F04030, 0x80000000, next_packet_id(packet_id));
+#else
+
+    write_register(fd, 0xF0F00A08, 0x00000000, next_packet_id(packet_id));
+    read_register(fd,  0xF0F00A0C, &value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F00A0C, value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F00A08, 0x00000000, next_packet_id(packet_id));
+    read_register(fd,  0xF0F00960, &value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F00964, &value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F00530, &value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F00830, &value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F00830, 0x80000000, next_packet_id(packet_id));
+    read_register(fd,  0xF0F0083C, &value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F0083C, value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F0053C, &value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F0083C, &value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F0083C, 0xC2000610, next_packet_id(packet_id));
+    write_register(fd, 0xF0F00968, 0x41200000, next_packet_id(packet_id)); //?Physical link configuration
+    read_register(fd,  0xF0F05410, &value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F04050, &value, next_packet_id(packet_id));
+    read_register(fd,  0xF0F04054, &value, next_packet_id(packet_id));
+
+    write_register(fd, GV_STREAM_CHANNEL_0_PORT_OFFSET, port, next_packet_id(packet_id));
+    read_register(fd,  GV_STREAM_CHANNEL_SOURCE_PORT_OFFSET, &value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F04030, 0x80000000, next_packet_id(packet_id));
 #endif
+    fprintf(stdout, "Acquisition started\n");
+    fflush(stdout);
 
     //Start source
     pthread_create(&thread_id, NULL, source_data_thread_udp, src);
@@ -957,15 +1000,23 @@ int connect_to_device(struct device *dev) {
     while(cnt < 15) {
         read_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, &value, next_packet_id(packet_id));
         if (value != 0x02) write_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, 0x02, next_packet_id(packet_id));
+        write_register(fd, 0xF0F04030, 0x80000000, next_packet_id(packet_id));
+        read_register(fd,  0x00000d1c, &value, next_packet_id(packet_id));
         sleep(1);
         cnt++;
     }
 
-#if 1
     //Stop acquisition
+    read_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, &value, next_packet_id(packet_id));
+    if (value != 0x02) write_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, 0x02, next_packet_id(packet_id));
+#if 0
     write_register(fd, 0x124, 0x00, next_packet_id(packet_id));
-    //write_register(fd, 0xF0F00614, 0x00000000, next_packet_id(packet_id));
+#else
+    read_register(fd,  0xF0F00614, &value, next_packet_id(packet_id));
+    write_register(fd, 0xF0F00614, 0x00000000, next_packet_id(packet_id));
 #endif
+    fprintf(stdout, "Acquisition stopped\n");
+    fflush(stdout);
 
     //Stop source
     src->exit_flag = 1;
@@ -1070,6 +1121,7 @@ struct gvcp_packet *listen_discovery_answer(int fd, struct sockaddr *addr) {
                 if (bytes < sizeof(struct gvcp_header)) {
                     fprintf(stdout, "[listen_discovery_answer]: wrong on inteface\n");
                     fflush(stdout);
+                    free(packet);
                     continue;
                 }
                 if (addr) memcpy(addr, &device_addr, sizeof(struct sockaddr));
@@ -1182,7 +1234,7 @@ int main(int argc, char *argv[]){
         struct interface *iface = list_entry(elem, struct interface, entry);
         elem = elem->next;
         struct gvcp_packet *packet = NULL;
-        while (packet = listen_discovery_answer(iface->fd, &device_addr)) {
+        while ((packet = listen_discovery_answer(iface->fd, &device_addr)) != NULL) {
             struct device *dev = device_add(devs, iface->addr, &device_addr, packet);
             interface_print(iface);
             device_print(dev);

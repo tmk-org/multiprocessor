@@ -63,6 +63,9 @@ target_include_directories (${PROJECT_NAME} PUBLIC
 #add_executable(cvdata examples/cvdata.cpp)
 #target_link_libraries(cvdata opencv_core opencv_highgui)
 
+add_executable(raw2bmp tools/raw2bmp.cpp)
+target_link_libraries(raw2bmp opencv_core opencv_highgui)
+
 add_executable(cvserver tools/cvserver.cpp)
 target_link_libraries(cvserver -pthread ${PROJECT_NAME})
 

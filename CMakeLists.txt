@@ -71,6 +71,8 @@ add_subdirectory(command_server)
 add_subdirectory(cvfilter)
 add_subdirectory(cvcamera)
 add_subdirectory(arvcamera)
+add_subdirectory(filereader)
+add_subdirectory(capture)
 #add_subdirectory(libstorage)
 #add_subdirectory(storage_interface)
 

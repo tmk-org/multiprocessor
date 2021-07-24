@@ -23,30 +23,30 @@ struct image_t {
 
 int read_image(char **pdata, char *src){
     if (!pdata) return -1;
-    if (!(*pdata)) {
-        *pdata = (struct image_t*)malloc(sizeof(struct image_t));
-    }
     struct image_t *image = (struct image_t*)(*pdata);
+    if (!image) {
+        image = (struct image_t*)malloc(sizeof(struct image_t));
+    }
     //TODO: place for work with image
     cv::Mat img = cv::imread(src, cv::IMREAD_ANYDEPTH |
                                                   cv::IMREAD_ANYCOLOR);
     image->size = img.total() * img.elemSize();
-    image->width
-    std::cout << "[read]: " << src << " ImgSize = " << image->size << std::endl; 
-    std::cout << "[read]: " << src << " ImgSize = " << image->size << std::endl; 
-    std::cout << "[read]: " << src << " ImgSize = " << image->size << std::endl; 
+    //image->width
+    std::cout << "[read]: " << src << " ImgSize = " << image->size << std::endl;
+    std::cout << "[read]: " << src << " ImgSize = " << image->size << std::endl;
+    std::cout << "[read]: " << src << " ImgSize = " << image->size << std::endl;
     //image->img_ptr = (void*)(&img);
     //image->img = img;
     *pdata = (char*)image;
-    std::cout << "!" << endl;
+    std::cout << "!" << std::endl;
     return 0;
 }
 
 int write_image(char *data, const char *dst){
     struct image_t *image = (struct image_t*)data;
     //TODO: place for work with image
-    //cv::Mat img = *((cv::Mat *)(image->img_ptr));
-    cv::Mat img = image->img;
+    cv::Mat img = *((cv::Mat *)data);
+    //cv::Mat img = image->img;
     int imgSize = img.total() * img.elemSize();
     std::cout << "[write]: ImgSize = " << imgSize << std::endl; 
     cv::imwrite(dst, img);
