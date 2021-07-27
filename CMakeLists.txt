@@ -73,6 +73,7 @@ add_subdirectory(cvcamera)
 add_subdirectory(arvcamera)
 add_subdirectory(filereader)
 add_subdirectory(capture)
+add_subdirectory(dbpg)
 #add_subdirectory(libstorage)
 #add_subdirectory(storage_interface)
 
