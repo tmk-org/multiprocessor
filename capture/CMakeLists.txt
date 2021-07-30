@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.17)
 set(PROJECT_NAME "capture")
 
 project(${PROJECT_NAME}
-    DESCRIPTION "Opencv camera and client with opencv filter for this one"
-    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/arvcamera"
+    DESCRIPTION "GigE camera udp capturing"
+    HOMEPAGE_URL "https://github.com/kat-spb/multiprocessor/capture"
     LANGUAGES C CXX)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -g")
@@ -25,13 +25,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # Find packages
 ###############################################################################
 
-find_package(OpenCV REQUIRED)
-
-add_library(aravis SHARED IMPORTED)
-set_property(TARGET aravis PROPERTY
-             IMPORTED_LOCATION /usr/lib/x86_64-linux-gnu/libaravis-0.8.so)
-target_link_libraries(${TARGET} aravis)
-
 ###############################################################################
 # Add sources
 ###############################################################################
@@ -42,8 +35,17 @@ add_library(${PROJECT_NAME} SHARED
     #header
     include/${PROJECT_NAME}/list.h
     include/${PROJECT_NAME}/ring_buffer.h
+    include/${PROJECT_NAME}/gvcp.h
+    include/${PROJECT_NAME}/gvsp.h  #warning: no file gvsp.c, it's ok 
+    include/${PROJECT_NAME}/device.h
+    include/${PROJECT_NAME}/interface.h
+    include/${PROJECT_NAME}/camera.h
     #sources
     src/ring_buffer.c
+    src/gvcp.c
+    src/device.c
+    src/interface.c
+    src/camera.c
 )
 
 target_link_libraries(${PROJECT_NAME})
@@ -63,11 +65,12 @@ target_include_directories (${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-add_executable(finddevices tools/finddevices.c)
-target_link_libraries(finddevices ${PROJECT_NAME})
+add_executable(oldcapture tools/capture.c)
+target_link_libraries(oldcapture ${PROJECT_NAME} -pthread)
 
-add_executable(udpcapture tools/capture.c)
+add_executable(udpcapture tools/test_capture.c)
 target_link_libraries(udpcapture ${PROJECT_NAME} -pthread)
+
 
 ###############################################################################
 # Tests
