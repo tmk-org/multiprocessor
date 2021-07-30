@@ -78,7 +78,7 @@ void* gvsp_thread(void *arg) {
     uint32_t packet_size = cam->packet_size - IP_HEADER_SIZE - UDP_HEADER_SIZE;
     struct gvsp_packet *packet = (struct gvsp_packet*)malloc(packet_size);
 
-    while (cam->state == STREAM_LIVE) {
+    while (cam->state == STREAM_LIVE && cam->gvsp_fd != -1) {
         //fprintf(stdout, "[gvsp_thread]: [1] Hello from source_data_thread_udp\n");
         //fflush(stdout);
         FD_ZERO(&readfd);
@@ -104,8 +104,8 @@ void* gvsp_thread(void *arg) {
                 extended_ids = gvsp_packet_has_extended_ids(packet);
                 frame_id = gvsp_packet_get_frame_id(packet);
                 packet_id = gvsp_packet_get_packet_id(packet);
-                fprintf(stdout, "[gvsp_threadp]: total = %d ", n_received_packets);
-                fprintf(stdout, "packet_id = 0x%hx(%d), frame_id = 0x%lx(%lu)\n", packet_id, packet_id, frame_id, frame_id);
+                //fprintf(stdout, "[gvsp_threadp]: total = %d ", n_received_packets);
+                //fprintf(stdout, "packet_id = 0x%hx(%d), frame_id = 0x%lx(%lu)\n", packet_id, packet_id, frame_id, frame_id);
                 //fflush(stdout);
 
                 //find frame data
@@ -232,8 +232,8 @@ void* gvsp_thread(void *arg) {
                 x /= 1000;
             }
 #else
-            //fprintf(stdout, "[gvsp_thread]: no data on inteface\n");
-            //fflush(stdout);
+            fprintf(stdout, "[gvsp_thread]: no data on inteface\n");
+            fflush(stdout);
 #endif
             usleep(100);
             continue;
@@ -368,10 +368,14 @@ int gige_camera_test(struct gige_camera *cam) {
     }
     gvcp_stop(cam->gvcp_fd, next_packet_id(cam->last_gvcp_packet_id));
     cam->state = STREAM_STOP;
+    close(cam->gvcp_fd);
+    cam->gvcp_fd = -1;
 #if 1
     sleep(1);
     cam->new_frame_action = NULL;
     pthread_join(cam->data_thread_id, NULL);
+    close(cam->gvsp_fd);
+    cam->gvsp_fd = -1;
 #endif
     return 0;
 }

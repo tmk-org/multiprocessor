@@ -37,26 +37,19 @@ void new_device_callback(void *internal_data, struct device *dev) {
 }
 
 int main(int argc, char *argv[]) {
-
-#if 1
+#if 0
     struct devices *devs = devices_discovery(NULL, new_device_callback);
+    free(devs);
 #else
-    struct devices *devs = prepare_devices_list();
-
-    list_t *elem = list_first_elem(&devs->device_list);
-    struct device *dev = list_entry(elem, struct device, entry);
-    elem = elem->next;
-    fprintf(stdout, "Found device\n");
-    fflush(stdout);
-    device_print(dev);
+    struct device *dev = device_find(argv[1]);
+    if (!dev) {
+        fprintf(stdout, "Device is null\n");
+        fflush(stdout);
+        return 0;
+    }
     if (new_device_callback) new_device_callback(NULL, dev);
-    struct gige_camera *cam = gige_camera_init(dev, new_frame_action);
-    gige_camera_test(cam);
-    gige_camera_destroy(cam);
     free(dev);
 #endif
-    free(devs);
-
     return 0;
 }
 

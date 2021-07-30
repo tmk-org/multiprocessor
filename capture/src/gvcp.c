@@ -181,9 +181,9 @@ struct gvcp_packet *listen_packet_ack(int fd) {
             }
         }
         else {
-            usleep(100);
-            continue;
-            //return NULL;
+            //usleep(100);
+            //continue;
+            return NULL;
         }
     }
     return NULL;
@@ -258,7 +258,7 @@ uint32_t gvcp_init(int fd, uint32_t packet_id, int data_fd) {
     return packet_size;
 }
 
-#if 0 //fake -- ok
+#if 1 //fake -- ok
 int gvcp_watchdog(int fd, uint32_t packet_id) {
     uint32_t value = -1;
     read_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, &value, next_packet_id(packet_id));
@@ -283,7 +283,7 @@ int gvcp_stop(int fd, uint32_t packet_id) {
 }
 #endif
 
-#if 1 //flir-color  -- ok
+#if 0 //flir-color  -- ok
 int gvcp_watchdog(int fd, uint32_t packet_id) {
     uint32_t value = -1;
     read_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, &value, next_packet_id(packet_id));

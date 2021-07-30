@@ -96,10 +96,8 @@ void device_print(struct device *dev) {
     fflush(stdout);
 }
 
-
-struct device *device_add(struct devices *devs, struct sockaddr *iface_addr, struct sockaddr *device_addr) {
+struct device *device_create(struct sockaddr *iface_addr, struct sockaddr *device_addr) {
     struct device *dev = (struct device *)malloc(sizeof(struct device));
-    if (dev == NULL) return NULL;
     memset(dev, 0, sizeof(struct device));
     dev->fd = -1;
     if (dev) {
@@ -113,7 +111,15 @@ struct device *device_add(struct devices *devs, struct sockaddr *iface_addr, str
         strcpy(dev->ip, "0.0.0.0");
         strcpy(dev->port, "0");
     }
-    dev->fd = -1;
+    else {
+        fprintf(stdout, "dev->ip = %d dev->port = %d\n", dev->ip, dev->port);
+        fflush(stdout);
+    }
+    return dev;
+}
+
+struct device *device_add(struct devices *devs, struct sockaddr *iface_addr, struct sockaddr *device_addr) {
+    struct device *dev = device_create(iface_addr, device_addr);
     if (devs) {
         list_add_back(&devs->device_list, &dev->entry);
         devs->device_cnt++;
@@ -141,7 +147,6 @@ int devices_init(struct devices *devs){
 void devices_destroy(struct devices *devs){
     list_t *item;
     struct device *dev;
-
     while(!list_is_empty(&devs->device_list)){
         item = list_first_elem(&devs->device_list);
         dev = list_entry(item, struct device, entry);
@@ -152,24 +157,42 @@ void devices_destroy(struct devices *devs){
 //id_string is ip now, we think that they are unique
 struct device *device_find(char *id_string) {
 
-    struct devices *devs = prepare_devices_list();
-    
-    list_t *elem = list_first_elem(&devs->device_list);
-    while(list_is_valid_elem(&devs->device_list, elem)) {
-        struct device *dev = list_entry(elem, struct device, entry);
+    struct interfaces *ifaces = prepare_interfaces_list();
+
+    sleep(1); //may be TIMEOUT const???
+
+    struct device *dev = (struct device *)malloc(sizeof(struct device));
+    struct sockaddr device_addr;
+    list_t *elem = list_first_elem(&ifaces->interface_list);
+    while(list_is_valid_elem(&ifaces->interface_list, elem)) {
+        struct interface *iface = list_entry(elem, struct interface, entry);
+        interface_print(iface);
         elem = elem->next;
-        if (strcmp(dev->ip, id_string)) {
-            fprintf(stdout, "Found device for source %d\n", 0);
-            fflush(stdout);
-            device_print(dev);
-            return dev;
+        struct gvcp_packet *packet = NULL;
+        while ((packet = listen_discovery_answer(iface->fd, &device_addr) )!= NULL) {
+            struct device *dev = device_create(iface->addr, &device_addr);
+            gvcp_discovery_ack(dev->vendor, dev->model, dev->serial, dev->user_id, dev->mac, packet);
+            if (strcmp(dev->ip, id_string) == 0) {
+                fprintf(stdout, "Found device for source %d\n", 0);
+                fflush(stdout);
+                device_print(dev);
+                ifaces_destroy(ifaces);
+                free(ifaces);
+                return dev;
+            }
+            else {
+                free(dev);
+            }
         }
     }
+    fprintf(stdout, "No device with id_string=\'%s\' found\n", id_string);
+    fflush(stdout);
+    ifaces_destroy(ifaces);
+    free(ifaces);
     return NULL;
 }
 
 struct devices *devices_discovery(void *internal_data, void (*new_device_callback)(void *internal_data, struct device *dev)) {
-
     struct devices *devs = prepare_devices_list();
 
     list_t *elem = list_first_elem(&devs->device_list);
