@@ -349,6 +349,7 @@ void gige_camera_destroy(struct gige_camera *cam) {
 #endif
     close(cam->gvsp_fd);
     close(cam->gvcp_fd);
+    if (cam->dev) free(dev);
     //free(camera);  -- this action should be called from place where were malloc()
 }
 
