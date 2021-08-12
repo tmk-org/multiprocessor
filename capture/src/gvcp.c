@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 //network interface and socket
 #include <sys/types.h>
@@ -9,6 +10,7 @@
 #include <net/if.h>
 
 #include <sys/socket.h>
+#include <sys/epoll.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 
@@ -21,6 +23,8 @@
 #include <unistd.h>
 
 #include "capture/gvcp.h"
+
+#define MAX_EVENTS 10
 
 void print_packet_full(struct gvcp_packet *packet) {
     struct gvcp_header *header = (struct gvcp_header*)packet; 
@@ -189,6 +193,66 @@ struct gvcp_packet *listen_packet_ack(int fd) {
     return NULL;
 }
 
+struct gvcp_packet *listen_packet_ack_new(int listen_fd) {
+    struct sockaddr device_addr;
+    socklen_t device_addr_len = sizeof(struct sockaddr);
+    struct epoll_event ev;
+    int epoll_fd;
+    int rc = 0;
+    ssize_t bytes = 0;
+
+    epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+    if (epoll_fd < 0){
+        fprintf(stderr, "Could not create epoll file descriptor: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    
+    //add for listen to epoll
+    ev.events = EPOLLIN | EPOLLRDHUP;
+    ev.data.ptr = &listen_fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_fd, &ev) != 0){
+        fprintf(stderr, "Could not add file descriptor to epoll set, error: %s\n", strerror(errno));
+        return NULL;
+    }
+
+    while (listen_fd != -1) {
+        struct epoll_event events[MAX_EVENTS];
+        int i, n, timeous_ms = -1;
+
+        n = epoll_wait(epoll_fd, events, MAX_EVENTS, timeous_ms);
+        if (n < 0) {
+            fprintf(stderr, "Could not wait for epoll events, error: %s\n", strerror(errno));
+            close(epoll_fd);
+            return NULL;
+        }
+
+        for(i = 0; i < n; i++) {
+            if (events[i].data.ptr == &listen_fd) {
+                uint32_t packet_size = sizeof(struct gvcp_header);
+                //for read and write register
+                packet_size += sizeof(uint32_t);
+                struct gvcp_packet *packet = (struct gvcp_packet*)malloc(packet_size);
+                bytes = recvfrom(listen_fd, packet, packet_size, 0, &device_addr, &device_addr_len);
+                if (bytes < 0) {
+                    fprintf(stdout, "[listen_packet_ack]: socket error\n");
+                    fflush(stdout);
+                    free(packet);
+                    return NULL;
+                }
+                if (bytes < packet_size) {
+                    fprintf(stdout, "[listen_packet_ack]: wrong on inteface\n");
+                    fflush(stdout);
+                    continue;
+                }
+                close(epoll_fd);
+                return packet;
+            }
+        }
+    }
+    close(epoll_fd);
+    return NULL;
+}
+
 //important: read/write commands are possible only after connect to command socket
 int read_register(int fd, uint32_t reg_addr, uint32_t *value, uint32_t packet_id) {
     uint32_t packet_size = 0;
@@ -197,7 +261,8 @@ int read_register(int fd, uint32_t reg_addr, uint32_t *value, uint32_t packet_id
     int rc = write(fd, packet, packet_size);
     free(packet);
     //usleep(500);
-    packet = listen_packet_ack(fd);
+    //packet = listen_packet_ack(fd);
+    packet = listen_packet_ack_new(fd);
     gvcp_register_ack(value, packet);
     //print_packet_full(packet);
     free(packet);
@@ -212,7 +277,8 @@ int write_register(int fd, uint32_t reg_addr, uint32_t value, uint32_t packet_id
     int rc = write(fd, packet, packet_size);
     free(packet);
     //usleep(500);
-    packet = listen_packet_ack(fd);
+    //packet = listen_packet_ack(fd);
+    packet = listen_packet_ack_new(fd);
     gvcp_register_ack(&value, packet);
     //print_packet_full(packet);
     free(packet);
@@ -258,7 +324,7 @@ uint32_t gvcp_init(int fd, uint32_t packet_id, int data_fd) {
     return packet_size;
 }
 
-#if 1 //fake -- ok
+#if 0 //fake -- ok
 int gvcp_watchdog(int fd, uint32_t packet_id) {
     uint32_t value = -1;
     read_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, &value, next_packet_id(packet_id));
@@ -283,7 +349,7 @@ int gvcp_stop(int fd, uint32_t packet_id) {
 }
 #endif
 
-#if 0 //flir-color  -- ok
+#if 1 //flir-color  -- ok
 int gvcp_watchdog(int fd, uint32_t packet_id) {
     uint32_t value = -1;
     read_register(fd, GV_CONTROL_CHANNEL_PRIVILEGE_OFFSET, &value, next_packet_id(packet_id));

@@ -74,6 +74,21 @@ struct gvcp_packet *listen_discovery_answer(int fd,  struct sockaddr *addr) {
                     free(packet);
                     continue;
                 }
+                uint32_t ip_local, port_tmp, ip_remote;
+                get_net_parameters_from_socket(fd, &ip_local, &port_tmp);
+                ip_remote = ntohl(((struct sockaddr_in*)&device_addr)->sin_addr.s_addr);
+                fprintf(stdout, "[listen_discovery_answer]: fd = %d ip_local = 0x%08x, ip_remote = 0x%08x\n", fd, ip_local, ip_remote);
+                fflush(stdout);
+                if (ip_local == ip_remote && ip_local != 0x7f000001) {
+                    fprintf(stdout, "[listen_discovery_answer]: ignore local cameras when not localhost\n");
+                    fflush(stdout);
+                    continue;
+                }
+                if ((ip_local & 0xFFFFFF00) != (ip_remote & 0xFFFFFF00)) {
+                    fprintf(stdout, "[listen_discovery_answer]: reply from other subnet\n");
+                    fflush(stdout);
+                    continue;
+                }
                 if (addr) memcpy(addr, &device_addr, sizeof(struct sockaddr));
                 return packet;
             }
@@ -112,7 +127,7 @@ struct device *device_create(struct sockaddr *iface_addr, struct sockaddr *devic
         strcpy(dev->port, "0");
     }
     else {
-        fprintf(stdout, "dev->ip = %d dev->port = %d\n", dev->ip, dev->port);
+        fprintf(stdout, "dev->ip = %s dev->port = %s\n", dev->ip, dev->port);
         fflush(stdout);
     }
     return dev;

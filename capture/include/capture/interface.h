@@ -18,7 +18,7 @@ struct interfaces {
     list_t interface_list;
 };
 
-
+void *get_in_addr(struct sockaddr *saddr);
 struct interfaces *prepare_interfaces_list();
 int send_broadcast_discovery(struct interface *iface);
 

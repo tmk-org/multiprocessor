@@ -104,13 +104,13 @@ void* gvsp_thread(void *arg) {
                 extended_ids = gvsp_packet_has_extended_ids(packet);
                 frame_id = gvsp_packet_get_frame_id(packet);
                 packet_id = gvsp_packet_get_packet_id(packet);
-                //fprintf(stdout, "[gvsp_threadp]: total = %d ", n_received_packets);
-                //fprintf(stdout, "packet_id = 0x%hx(%d), frame_id = 0x%lx(%lu)\n", packet_id, packet_id, frame_id, frame_id);
-                //fflush(stdout);
+                fprintf(stdout, "[gvsp_threadp]: total = %d ", n_received_packets);
+                fprintf(stdout, "packet_id = 0x%hx(%d), frame_id = 0x%lx(%lu)\r", packet_id, packet_id, frame_id, frame_id);
+                fflush(stdout);
 
                 //find frame data
                 //now is primitive:  check that frame_id > last_frame_id
-                if (frame_id > last_frame_id) {
+                if (frame_id != last_frame_id) {
                     if (frame->is_started) {
                         if (cam->new_frame_action) cam->new_frame_action(frame->buffer, frame->real_size, (void*)&last_frame_id);
                     }
@@ -349,7 +349,7 @@ void gige_camera_destroy(struct gige_camera *cam) {
 #endif
     close(cam->gvsp_fd);
     close(cam->gvcp_fd);
-    if (cam->dev) free(dev);
+    if (cam->dev) free(cam->dev);
     //free(camera);  -- this action should be called from place where were malloc()
 }
 
