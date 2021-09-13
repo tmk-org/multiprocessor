@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "messenger/messenger.h"
 
@@ -13,7 +14,11 @@ int main(int argc, char *argv[]){
     }
 
     struct server *srv = server_create(argv[1], 10, NULL, NULL);
-    tcp_server_process((void *)srv);
+
+    while (!srv->exit_flag) {
+        sleep(2);
+    }
+
     server_destroy(srv);
 
     return 0;

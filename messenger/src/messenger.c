@@ -40,6 +40,22 @@ void connection_delete(list_t *connection_list, int *connection_cnt, struct conn
     free(connection);
 }
 
+struct connection *connection_get(char *host, char *port, list_t *connection_list){
+    list_t *item;
+    struct connection *connection;
+    item = list_first_elem(connection_list);
+    while(list_is_valid_elem(connection_list, item)){
+        connection = list_entry(item, struct connection, entry);
+        fprintf(stdout, "[connection_get]: compare '%s':'%s' vs '%s':'%s'\n", connection->host, connection->service, host, port);
+        fflush(stdout);
+        if (strcmp(connection->service, port) == 0 && strcmp(connection->host, host) == 0) {
+            return connection;
+        }
+        item = item->next;
+    }
+    return NULL;
+}
+
 //return 0 if add_connection is ok, else return 1
 int server_add_connection(char *host, char *service, struct server *srv, int fd) {
     struct epoll_event ev;
@@ -116,6 +132,7 @@ int client_add_connection(char *host, char *port, struct client *cli) {
 
     strncpy(new_conn->host, host, sizeof(new_conn->host));
     strncpy(new_conn->service, port, sizeof(new_conn->service));
+    new_conn->fd = fd;
 
     // add new connection to the listen on epoll
     ev.events = EPOLLIN | EPOLLRDHUP;
@@ -128,7 +145,7 @@ int client_add_connection(char *host, char *port, struct client *cli) {
         return -1;
     }
 
-    return 0;
+    return fd;
 }
 
 int read_connection_data(struct connection *conn) {
@@ -182,51 +199,60 @@ void parse_api_request(struct message *msg) {
         fprintf(stdout, "[parse_api_request]: reply message recieved\n");
         fflush(stdout);
         msg->type = MSG_REPLY;
+        msg->cmd_len = 2;
     }
     if (strcasestr(buf, "CONNECT") != 0) {
         fprintf(stdout, "[parse_api_request]: connect message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_CONNECT;
+        msg->cmd_len = strlen("CONNECT");
     }
     if (strcasestr(buf, "START") != 0) {
         fprintf(stdout, "[parse_api_request]: start message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_START;
+        msg->cmd_len = strlen("START");
     }
     if (strcasestr(buf, "STOP") != 0) {
         fprintf(stdout, "[parse_api_request]: stop message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_STOP;
+        msg->cmd_len = strlen("STOP");
     }
     if (strcasestr(buf, "STATUS") != 0) {
         fprintf(stdout, "[parse_api_request]: status message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_STATUS;
+        msg->cmd_len = strlen("STATUS");
      }
      if (strcasestr(buf, "SET") != 0) {
         fprintf(stdout, "[parse_api_request]: set message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_SET;
+        msg->cmd_len = strlen("SET");
      }
      if (strcasestr(buf, "GET") != 0) {
         fprintf(stdout, "[parse_api_request]: get message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_GET;
+        msg->cmd_len = strlen("GET");
      }
      if (strcasestr(buf, "CONFIG") != 0) {
         fprintf(stdout, "[parse_api_request]: get message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_CONFIG;
+        msg->cmd_len = strlen("CONFIG");
      }
-     if (strcasecmp(buf, "QUIT") == 0 || strcasecmp(buf, "Q") == 0) {
+     if (strcasestr(buf, "QUIT") != 0 || strcasecmp(buf, "Q") == 0 || strcasecmp(buf, "Q\n") == 0) {
         fprintf(stdout, "[parse_api_request]: quit message recieved\n");
         fflush(stdout);
         msg->cmd = MSG_CMD_QUIT;
+        msg->cmd_len = strlen("QUIT");
      }
 }
 
 int msg_get_connect_information(struct message *msg, char **phost, char **pport) {
-    char *result = strdup(msg->msg_string + strlen("connect "));
+    char *result = strdup(msg->msg_string + msg->cmd_len + 1);
     char *port = strrchr(result, ' ');
     if (!port) {
         fprintf(stdout, "[msg_get_connect_information]: not enouth data for connect\n");
@@ -243,21 +269,30 @@ int msg_get_connect_information(struct message *msg, char **phost, char **pport)
     return 0;
 }
 
+//this message will be printed when SIGUSR2 signal on epoll_pwait
+void sigusr2_handler(int sig){
+    (void)sig;
+    fprintf(stdout, "[sigusr2_handler]: sigusr2 signal\n");
+    fflush(stdout);
+}
+
 void client_execute_callback(void *internal_data, struct message *msg) {
+    struct client *cli = (struct client *)internal_data;
+    char *host, *port;
     switch (msg->cmd) {
         case MSG_CMD_QUIT: {
-            struct client *cli = (struct client *)internal_data;
             cli->exit_flag = 1;
+            fprintf(stdout, "[client_execute_callback]: sending SIGUSR2 to epoll thread ...\n");
+            fflush(stdout);
+            pthread_kill(cli->epoll_thread_id, SIGUSR2);
             break;
         }
         case MSG_CMD_CONNECT: {
             //add new connection to listen on epoll_wait
-            struct client *cli = (struct client *)internal_data;
-            char *host, *port;
             if (msg_get_connect_information(msg, &host, &port) == 0) {
-                fprintf(stdout, "[client_execute_callback]: new connection command %s\n", msg->msg_string);
+                int fd = client_add_connection(host, port, cli);
+                fprintf(stdout, "[client_execute_callback]: new connection fd = %d for command %s\n", fd, msg->msg_string);
                 fflush(stdout);
-                client_add_connection(host, port, cli);
             }
             else {
                 fprintf(stdout, "[client_execute_callback]: connection information is wrong %s\n", msg->msg_string);
@@ -267,7 +302,6 @@ void client_execute_callback(void *internal_data, struct message *msg) {
         }
         case MSG_CMD_STATUS: {
             //TODO: read all from replies ring buffer
-            //struct client *cli = (struct client *)internal_data;
             fprintf(stdout, "[client_execute_callback]: command status is not implemented %s\n", msg->msg_string);
             fflush(stdout);
             break;
@@ -276,15 +310,30 @@ void client_execute_callback(void *internal_data, struct message *msg) {
         case MSG_CMD_START:
         case MSG_CMD_SET:
         case MSG_CMD_GET: {
-            //TODO: parse message string and sent command to right destination
-            struct connection *conn = (struct connection *)internal_data;
-            fprintf(stdout, "[client_execute_callback]: sent command %s to connection fd = %d\n", msg->msg_string, conn->fd);
-            fflush(stdout);
-            write(conn->fd, msg->msg_string, msg->msg_len);
+            if (msg_get_connect_information(msg, &host, &port) == 0) {
+                struct connection *conn = connection_get(host, port, &cli->connection_list);
+                int fd;
+                if (!conn) {
+                    fprintf(stdout, "[client_execute_callback]: wrong connection to %s:%s, try to reconnect\n", msg->msg_string, host, port);
+                    fflush(stdout);
+                    fd = client_add_connection(host, port, cli);
+                    if (fd == -1) {
+                        break;
+                    }
+                }
+                fd = conn->fd;
+                fprintf(stdout, "[client_execute_callback]: sent command %s to connection fd = %d\n", msg->msg_string, conn->fd);
+                fflush(stdout);
+                write(conn->fd, msg->msg_string, msg->msg_len);
+            }
+            else {
+                fprintf(stdout, "[client_execute_callback]: connection information is wrong %s\n", msg->msg_string);
+                fflush(stdout);
+            }
             break;
         }
         default: 
-            fprintf(stdout, "[client_execute_callback]: unsupported command %s\n", msg->msg_string);
+            fprintf(stdout, "[client_execute_callback]: unsupported command %s [%d]\n", msg->msg_string, msg->cmd);
             fflush(stdout);
     }
 };
@@ -303,7 +352,11 @@ void *event_thread(void *arg) {
     while (!cli->exit_flag) {
         int i, timeout_ms = -1;
         //ATTENTION: we can STOP this thread ONLY with signal
+#if 0
         int n = epoll_wait(cli->epoll_fd, events, cli->max_events, timeout_ms);
+#else
+        int n = epoll_pwait(cli->epoll_fd, events, cli->max_events, -1, &cli->sigset);
+#endif
 
         if (cli->exit_flag) {
             fprintf(stdout, "[event_thread]: ok, stopping thread by signal (cli->exit_flag = %d)\n", cli->exit_flag);
@@ -341,7 +394,7 @@ void *event_thread(void *arg) {
                     client_event_callback((void*)conn, msg);
                 }
                 else { //make something with connection->request
-                    fprintf(stdout, "[[event_thread]: we are with the NOT null server execute callback\n");
+                    fprintf(stdout, "[event_thread]: we are with the NOT null server execute callback\n");
                     fflush(stdout);
                     cli->event_callback((void*)cli, msg);
                 }
@@ -355,6 +408,9 @@ void *event_thread(void *arg) {
 //cycle on epoll_wait for translate messages to server
 void *tcp_client_process(void *arg){
     struct client *cli = (struct client*)arg;
+
+    pthread_sigmask(SIG_SETMASK, NULL, &cli->sigset);
+    sigdelset(&cli->sigset, SIGUSR2);
 
     int epoll_fd = epoll_create1(EPOLL_CLOEXEC);
     if (epoll_fd < 0){
@@ -379,6 +435,10 @@ void *tcp_client_process(void *arg){
         client_execute_callback((void *)cli, msg);
     }
 
+    fprintf(stdout, "[tcp_client_process]: sending SIGUSR2 to epoll thread ...\n");
+    fflush(stdout);
+    pthread_join(cli->epoll_thread_id, NULL);
+
     close(epoll_fd);
     return NULL;
 }
@@ -391,7 +451,15 @@ struct client *client_create(void (*event_callback)(struct connection *conn, str
     cli->exit_flag = 0;
     cli->max_events = 10;
     cli->event_callback = event_callback;
-    //pthread_create(&cli->listen_thread_id, NULL, tcp_client_process, srv);
+
+    sigemptyset(&cli->sigset);
+    sigaddset(&cli->sigset, SIGUSR2);
+    pthread_sigmask(SIG_BLOCK, &cli->sigset, NULL);
+    sigemptyset(&cli->action.sa_mask);
+    cli->action.sa_handler = sigusr2_handler;
+    cli->action.sa_flags = 0;
+    sigaction(SIGUSR2, &cli->action, NULL);
+
     return cli;
 }
 
@@ -409,12 +477,17 @@ void client_destroy(struct client *cli) {
 
 void server_execute_callback(void *internal_data, struct message *msg) {
     struct server *srv = (struct server *)internal_data;
+    fprintf(stdout, "[server_execute_callback]: Hello from server_execute_callback\n");
+    fflush(stdout);
     switch (msg->cmd) {
         case MSG_CMD_STOP:
             srv->exit_flag = 1;
+            fprintf(stdout, "[server_execute_callback]: sending SIGUSR2 to listen thread ...\n");
+            fflush(stdout);
+            pthread_kill(srv->listen_thread_id, SIGUSR2);
             break;
         //case MSG_CMD_STATUS:
-        //    ring_buffer_push();
+        //    ring_buffer_pop();
         default: 
             fprintf(stdout, "[server_execute_callback]: unsupported command %s\n", msg->msg_string);
             fflush(stdout);
@@ -461,6 +534,10 @@ void *tcp_server_process(void *arg){
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int rc, reuse_addr;
+
+    pthread_sigmask(SIG_SETMASK, NULL, &srv->sigset);
+    sigdelset(&srv->sigset, SIGUSR2);
+ 
     epoll_fd = epoll_create1(EPOLL_CLOEXEC);
     if (epoll_fd < 0){
         fprintf(stderr, "[tcp_server_process]: could not create epoll file descriptor: %s\n", strerror(errno));
@@ -534,7 +611,11 @@ void *tcp_server_process(void *arg){
     while (!srv->exit_flag) {
         int i, timeout_ms = -1;
         //ATTENTION: we can STOP this thread ONLY with signal
+#if 0
         int n = epoll_wait(epoll_fd, events, srv->max_events, timeout_ms);
+#else
+        int n = epoll_pwait(epoll_fd, events, srv->max_events, -1, &srv->sigset);
+#endif
 
         if (srv->exit_flag) {
             fprintf(stdout, "[tcp_server_process]: ok, stopping thread by signal (srv->exit_flag = %d)\n", srv->exit_flag);
@@ -632,7 +713,16 @@ struct server *server_create(char *port, int max_events,
     srv->execute_callback = execute_callback;
     srv->send_replies_callback = send_replies_callback;
     list_init(&srv->connection_list);
-    //pthread_create(&srv->listen_thread_id, NULL, tcp_server_process, srv);
+
+    sigemptyset(&srv->sigset);
+    sigaddset(&srv->sigset, SIGUSR2);
+    pthread_sigmask(SIG_BLOCK, &srv->sigset, NULL);
+    sigemptyset(&srv->action.sa_mask);
+    srv->action.sa_handler = sigusr2_handler;
+    srv->action.sa_flags = 0;
+    sigaction(SIGUSR2, &srv->action, NULL);
+
+    pthread_create(&srv->listen_thread_id, NULL, tcp_server_process, srv);
     return srv;
 }
 
@@ -646,8 +736,9 @@ void server_destroy(struct server *srv) {
         connection_delete(&srv->connection_list, &srv->connection_cnt, connection);
     }
     srv->exit_flag = 1;
-    //TODO: epoll_wait could be stopped only by signal 
-    usleep(500000);
+    //ATTENTION: epoll_wait could be stopped only by signal 
+    fprintf(stdout, "[server_destroy]: sending SIGUSR2 to epoll thread ...\n");
+    fflush(stdout);
     pthread_join(srv->listen_thread_id, NULL);
     free(srv);
 }
@@ -656,7 +747,7 @@ struct proxy *proxy_create(int max_clients) {
     struct proxy *px = (struct proxy *)malloc(sizeof(struct proxy));
     px->max_clients = max_clients;
     px->clients_cnt = 0;
-    px->clients = (struct client **)malloc(px->max_clients * sizeof(struct client));
+    px->clients = (struct client **)malloc(px->max_clients * sizeof(struct client *) * sizeof(struct client));
     for (int i = 0; i < px->clients_cnt; i++) {
         px->clients[i] = NULL;
     }

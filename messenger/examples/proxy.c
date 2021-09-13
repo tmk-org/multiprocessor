@@ -16,10 +16,11 @@ int main(int argc, char *argv[]){
 
     struct server *srv = server_create(argv[1], 10, NULL, NULL);
     proxy_add_server(px, srv);
-    for (int i = 1; i < argc; i += 2) {
-        struct client *cli = client_create(NULL);
-        //argv[i+1], argv[i+2]
-        proxy_add_client(px, cli);
+    struct client *cli = client_create(NULL);
+    proxy_add_client(px, cli);
+
+    while (!px->exit_flag) {
+        sleep(2);
     }
 
     proxy_destroy(px);

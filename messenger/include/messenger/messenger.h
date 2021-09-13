@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <pthread.h>
+#include <signal.h>
 
 #include "misc/list.h"
 #include "misc/ring_buffer.h"
@@ -42,6 +43,7 @@ struct message_actions {
 
 struct message {
     enum MSG_CMD cmd;
+    int cmd_len;
     enum MSG_TYPE type;
     int src_id;
     int dst_id;
@@ -74,7 +76,8 @@ struct client {
     int max_events;
     pthread_t epoll_thread_id;
     int exit_flag;
-    void (*sigusr2_handler)(int sig);
+    sigset_t sigset;
+    struct sigaction action;
 
     struct message *(*read_action_callback)(void *internal_data);
 
@@ -97,6 +100,8 @@ struct server {
 
     int epoll_fd;
     int max_events;
+    sigset_t sigset;
+    struct sigaction action;
 
     int exit_flag;
 
@@ -118,6 +123,7 @@ void *tcp_server_process(void *arg); //@arg is pointer to 'struct server'
 void server_destroy(struct server *srv);
 
 struct proxy {
+    int exit_flag;
     int max_clients;
     struct server *srv;      //only one server in proxy supported
     int clients_cnt;
