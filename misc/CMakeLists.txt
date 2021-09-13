@@ -29,6 +29,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 add_library(${PROJECT_NAME} SHARED
     #headers
+    include/misc/log.h
     include/misc/list.h
     include/misc/ring_buffer.h
     #sources

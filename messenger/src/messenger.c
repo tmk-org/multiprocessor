@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <signal.h>
 
+#include "misc/log.h"
 #include "misc/list.h"
 #include "misc/ring_buffer.h"
 
@@ -46,8 +47,7 @@ struct connection *connection_get(char *host, char *port, list_t *connection_lis
     item = list_first_elem(connection_list);
     while(list_is_valid_elem(connection_list, item)){
         connection = list_entry(item, struct connection, entry);
-        fprintf(stdout, "[connection_get]: compare '%s':'%s' vs '%s':'%s'\n", connection->host, connection->service, host, port);
-        fflush(stdout);
+        LOG_FD("[%s]: compare '%s':'%s' vs '%s':'%s'\n", __FUNCTION__, connection->host, connection->service, host, port);
         if (strcmp(connection->service, port) == 0 && strcmp(connection->host, host) == 0) {
             return connection;
         }
@@ -202,8 +202,7 @@ void parse_api_request(struct message *msg) {
         msg->cmd_len = 2;
     }
     if (strcasestr(buf, "CONNECT") != 0) {
-        fprintf(stdout, "[parse_api_request]: connect message recieved\n");
-        fflush(stdout);
+        LOG_FD("[%s]: connect message recieved\n", __FUNCTION__);
         msg->cmd = MSG_CMD_CONNECT;
         msg->cmd_len = strlen("CONNECT");
     }
